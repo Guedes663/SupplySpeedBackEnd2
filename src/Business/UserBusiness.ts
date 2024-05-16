@@ -1,6 +1,9 @@
+import { UserData } from "../Data/UserData";
 import { CustomError } from "../utils/CustomError";
 
 export class UserBusiness {
+
+    constructor(private userData: UserData) {}
 
     registerUser = async (registrationData: any) => {
         try{ 
@@ -13,6 +16,10 @@ export class UserBusiness {
             if (tipoUsuario.toLowerCase() !== "cliente" && tipoUsuario.toLowerCase() !== "distribuidora") {
                 throw new CustomError("O tipo de usuário só pode ser preenchida com 'cliente' ou 'distribuidora'", 400);
             }
+
+            const dataChecked = await this.userData.checkInfo({nome, email, cnpj_cpf, telefoneCelular});
+
+            return dataChecked;
 
         } catch(err: any) {
             throw new CustomError(err.message, err.statusCode);

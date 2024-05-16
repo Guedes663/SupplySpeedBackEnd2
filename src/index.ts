@@ -1,6 +1,5 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
-import connection from "./connection";
 import { v4 } from "uuid";
 import * as jwt from "jsonwebtoken";
 import { userRoutes } from "./routes/userRoutes";
