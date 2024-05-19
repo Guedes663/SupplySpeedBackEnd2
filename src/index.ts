@@ -1,7 +1,5 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
-import { v4 } from "uuid";
-import * as jwt from "jsonwebtoken";
 import { userRoutes } from "./routes/userRoutes";
 
 const app = express();
@@ -29,16 +27,7 @@ app.listen(process.env.PORT || 3003, () => {
     console.log("Server is running in http://localhost:3003");
 });
 
-
 /*
-function gerarToken(infoDoUsuario: object): any {
-    return jwt.sign(
-        infoDoUsuario,
-        "bananinha",
-        { expiresIn: "24h" }
-    );
-}
-
 app.get("/buscarPedidos/:idUsuario", async (req: Request, res: Response) => {
     try {
         const idUsuario: string = req.params.idUsuario;
@@ -182,89 +171,4 @@ app.get("/buscarInfo/:numPagina/:idUsuario", async (req: Request, res: Response)
         }
     }
 });
-
-app.post("/cadastrarUsuario", async (req: Request, res: Response) => {
-    try {
-        const { nome, email, senha, tipoUsuario, cnpj_cpf, descricao, telefoneCelular, estado, cidade, bairro, rua, numero, cep } = req.body;
-
-        if (!nome || !email || !senha || !tipoUsuario || !cnpj_cpf || !descricao || !telefoneCelular) {
-            throw new Error("'nome', 'email', 'senha', 'tipoUsuario', 'cnpj_cpf', 'descricao', 'telefoneCelular', 'estado', 'cidade', 'bairro', 'rua', 'numero' e 'cep' são obrigatórios");
-        }
-
-        if (tipoUsuario.toLowerCase() !== "cliente" && tipoUsuario.toLowerCase() !== "distribuidora") {
-            throw new Error("O tipo de usuário só pode ser preenchida com 'cliente' ou 'distribuidora'");
-        }
-
-        const dadosConsulta = await connection('usuario')
-            .select("nome", "email", "cnpj_cpf", "telefoneCelular")
-            .whereRaw(
-                "LOWER(nome) LIKE LOWER(?) OR LOWER(email) LIKE LOWER(?) OR cnpj_cpf LIKE ? OR telefoneCelular LIKE ?",
-                [nome, email, cnpj_cpf, telefoneCelular]
-            );
-
-        if (dadosConsulta.length > 0) {
-            if (dadosConsulta[0].nome === nome) {
-                throw new Error("nome de usuário já cadastrado");
-            }
-            else if (dadosConsulta[0].email === email) {
-                throw new Error("Email já cadastrado");
-            }
-            else if (dadosConsulta[0].cnpj_cpf === cnpj_cpf) {
-                throw new Error("cnpj_cpf já cadastrado");
-            }
-            else if (dadosConsulta[0].telefoneCelular === telefoneCelular) {
-                throw new Error("telefone/celular já cadastrado");
-            }
-        }
-
-        const idUsuario = v4();
-
-        await connection("usuario").insert({
-            idUsuario,
-            nome,
-            email,
-            senha,
-            tipoUsuario,
-            cnpj_cpf,
-            descricao,
-            telefoneCelular
-        });
-
-        await connection("endereco").insert({
-            estado,
-            cidade,
-            bairro,
-            rua,
-            numero,
-            cep,
-            idUsuario
-        });
-
-        const token = gerarToken({ idUsuario, nome, email, senha, });
-
-        res.status(201).send(token);
-    }
-    catch (error) {
-        if (
-            error.message === "'nome', 'email', 'senha', 'tipoUsuario', 'cnpj_cpf', 'descricao', 'telefoneCelular', 'estado', 'cidade', 'bairro', 'rua', 'numero' e 'cep' são obrigatórios"
-            || error.messsage === "O tipo de usuário só pode ser preenchida com 'cliente' ou 'distribuidora'"
-            || error.message === 'nome de usuário já cadastrado' || error.message === 'Email já cadastrado' || error.message === "cnpj_cpf já cadastrado"
-            || error.message === "telefone/celular já cadastrado"
-        ) {
-            res.status(400).send(error.message);
-        }
-        else {
-            res.status(500).send(error.message);
-        }
-    }
-});
-
-function morgan(arg0: string): any {
-    throw new Error("Function not implemented.");
-}
-
-
-function helmet(): any {
-    throw new Error("Function not implemented.");
-}
 */

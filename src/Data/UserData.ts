@@ -1,8 +1,9 @@
+import { isThrowStatement } from "typescript";
 import connection from "./connection";
 
 export class UserData {
 
-    checkInfo = async (data: any) => {
+    public checkInfoExist = async (data: any) => {
         try {
             const queryData = await connection('usuario')
                 .select("nome", "email", "cnpj_cpf", "telefoneCelular")
@@ -12,9 +13,53 @@ export class UserData {
                 );
 
             return queryData;
-        } catch (err: any) {
 
+        } catch (err: any) {
+            throw new Error(err.message);
         }
     }
 
+    public registerUser = async (data: any, idUsuario: string) => {
+        try {
+
+            const { nome, email, senha, tipoUsuario, cnpj_cpf, descricao, telefoneCelular, estado, cidade, bairro, rua, numero, cep } = data;
+
+            await connection("usuario").insert({
+                idUsuario,
+                nome,
+                email,
+                senha,
+                tipoUsuario,
+                cnpj_cpf,
+                descricao,
+                telefoneCelular
+            });
+
+            await connection("endereco").insert({
+                estado,
+                cidade,
+                bairro,
+                rua,
+                numero,
+                cep,
+                idUsuario
+            });
+
+        } catch (err: any) {
+            throw new Error(err.message);
+        }
+    }
+
+    public authenticateUser = async (email: string, senha: any) => {
+        try {
+            const queryData = await connection("usuario")
+                .select('idUsuario', 'email', 'senha')
+                .where({ email, senha });
+
+            return queryData;
+
+        } catch (err: any) {
+            throw new Error(err.message);
+        }
+    }
 }
