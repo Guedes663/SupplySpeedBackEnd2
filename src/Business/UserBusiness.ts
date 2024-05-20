@@ -1,19 +1,11 @@
 import { UserData } from "../Data/UserData";
 import { CustomError } from "../utils/CustomError";
+import { TokenUtils } from "../utils/TokenUtils";
 import { v4 } from "uuid";
-import * as jwt from "jsonwebtoken";
 
 export class UserBusiness {
 
     constructor(private userData: UserData) { }
-
-    private gerarToken = (infoDoUsuario: object) => {
-        return jwt.sign(
-            infoDoUsuario,
-            process.env.KEY_TOKEN,
-            { expiresIn: "24h" }
-        );
-    }
 
     public registerUser = async (registrationData: any) => {
         try {
@@ -48,7 +40,7 @@ export class UserBusiness {
 
             await this.userData.registerUser(registrationData, idUsuario);
 
-            const token = this.gerarToken({ idUsuario, email, senha, });
+            const token = TokenUtils.generateToken({ idUsuario, email, senha, tipoUsuario });
             return token;
 
         } catch (err: any) {
@@ -70,9 +62,25 @@ export class UserBusiness {
                 throw new CustomError("Email ou senha incorreto!", 400);
             }
 
-            const { idUsuario } = result[0];
-            const token = this.gerarToken({ idUsuario, email, senha });
+            const { idUsuario, tipoUsuario } = result[0];
+            const token = TokenUtils.generateToken({ idUsuario, email, senha, tipoUsuario });
             return token;
+
+        } catch(err: any) {
+            throw new CustomError(err.message, err.statusCode);
+        }
+    }
+
+    public searchUsers = async (numPage: any, token: any) => {
+        try {
+            if (numPage == "null" || parseInt(numPage) < 1) {
+                throw new CustomError("Número da página está faltando ou não é válido!", 400);
+            }
+
+            const tokenData = TokenUtils.getTokenInformation(token);
+            const users = await this.userData.searchUsers(numPage, tokenData);
+
+            return users;
 
         } catch(err: any) {
             throw new CustomError(err.message, err.statusCode);

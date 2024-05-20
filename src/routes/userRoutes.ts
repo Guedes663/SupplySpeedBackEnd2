@@ -9,7 +9,8 @@ const userData = new UserData();
 const userBusiness = new UserBusiness(userData);
 const userController = new UserController(userBusiness);
 
-userRoutes.post("/signup/", userController.registerUser);
-userRoutes.post("/login/", userController.login);
+userRoutes.post("/signup", userController.registerUser);
+userRoutes.post("/login", userController.login);
+userRoutes.get("/searchInformation/:numPage/:token", userController.searchUsers);
 
 export { userRoutes };

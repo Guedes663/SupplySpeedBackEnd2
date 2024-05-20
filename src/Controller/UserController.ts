@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { UserBusiness } from '../Business/UserBusiness';
-import { userRoutes } from '../routes/userRoutes';
 
 export class UserController {
 
@@ -30,4 +29,17 @@ export class UserController {
         }
     }
 
+    public searchUsers = async (req: Request, res: Response) => {
+        try {
+            const numPage = req.params.numPage;
+            const token = req.params.token;
+            const users = await this.userBusiness.searchUsers(numPage, token);
+
+
+            res.status(200).send(users);
+            
+        } catch(err: any) {
+            res.status(err.statusCode || 500).send(err.message);
+        }
+    }
 }
