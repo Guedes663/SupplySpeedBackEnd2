@@ -1,5 +1,6 @@
 import * as jwt from "jsonwebtoken";
 import { CustomError } from "./CustomError";
+import { TokenData } from "../models/Token";
 
 export class TokenUtils {
 
@@ -9,7 +10,7 @@ export class TokenUtils {
 
     public static getTokenInformation(token: string) {
         try {
-            return jwt.verify(token, process.env.KEY_TOKEN);
+            return jwt.verify(token, process.env.KEY_TOKEN) as TokenData;
         } catch (err: any) {
             throw new CustomError('Token inválido', 400);
         }

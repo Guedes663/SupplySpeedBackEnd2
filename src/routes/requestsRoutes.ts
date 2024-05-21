@@ -9,6 +9,6 @@ const requestsData = new RequestsData();
 const requestsBusiness = new RequestsBusiness(requestsData);
 const requestsController = new RequestsController(requestsBusiness);
 
-requestsRoutes.post("/searchOrders/", requestsController.searchOrders);
+requestsRoutes.post("/searchOrders", requestsController.searchOrders);
 
 export { requestsRoutes };

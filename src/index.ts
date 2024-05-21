@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import cors from "cors";
 import { userRoutes } from "./routes/userRoutes";
 import { requestsRoutes } from "./routes/requestsRoutes";
+import { productsRoutes } from "./routes/productsRoutes";
 
 const app = express();
 
@@ -11,6 +12,7 @@ app.use(cors());
 // Configura as rotas da aplicação
 app.use("/users/", userRoutes);
 app.use("/requests/", requestsRoutes);
+app.use("/products/", productsRoutes);
 
 // Rota principal para verificar se o servidor está funcionando
 app.get('/', (req: Request, res: Response) => {
