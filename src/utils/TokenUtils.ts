@@ -12,7 +12,7 @@ export class TokenUtils {
         try {
             return jwt.verify(token, process.env.KEY_TOKEN) as TokenData;
         } catch (err: any) {
-            throw new CustomError('Token inválido', 400);
+            throw new CustomError('Token inválido ou não existe', 400);
         }
     }
 }

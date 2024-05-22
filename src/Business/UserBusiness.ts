@@ -52,13 +52,13 @@ export class UserBusiness {
         try {
             const { email, senha } = loginData;
 
-            if(!email || !senha) {
+            if (!email || !senha) {
                 throw new CustomError("Email ou senha não foi recebido!", 400);
             }
 
             const result = await this.userData.authenticateUser(email, senha);
 
-            if(result.length === 0) {
+            if (result.length === 0) {
                 throw new CustomError("Email ou senha incorreto!", 400);
             }
 
@@ -66,23 +66,42 @@ export class UserBusiness {
             const token = TokenUtils.generateToken({ idUsuario, email, senha, tipoUsuario });
             return token;
 
-        } catch(err: any) {
+        } catch (err: any) {
             throw new CustomError(err.message, err.statusCode);
         }
     }
 
-    public searchUsers = async (numPage: any, token: any) => {
+    public searchInformation = async (numPage: any, token: any) => {
         try {
             if (numPage == "null" || parseInt(numPage) < 1) {
                 throw new CustomError("Número da página está faltando ou não é válido!", 400);
             }
 
             const tokenData = TokenUtils.getTokenInformation(token);
-            const users = await this.userData.searchUsers(numPage, tokenData);
+            const users = await this.userData.searchInformation(numPage, tokenData);
 
             return users;
 
-        } catch(err: any) {
+        } catch (err: any) {
+            throw new CustomError(err.message, err.statusCode);
+        }
+    }
+
+    public getProfileInformation = async (token: any, idProfile: any) => {
+        try {
+            TokenUtils.getTokenInformation(token);
+
+            const profileType = await this.userData.checkIdPerfil(idProfile);
+
+            if (profileType.length < 1 || profileType[0].tipoUsuario !== "distribuidora") {
+                throw new CustomError("Usuário não é distribuidora ou não existe", 400);
+            }
+
+            const profileInformation = await this.userData.getProfileInformation(idProfile);
+
+            return profileInformation;
+
+        } catch (err: any) {
             throw new CustomError(err.message, err.statusCode);
         }
     }

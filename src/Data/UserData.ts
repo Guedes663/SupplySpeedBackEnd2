@@ -62,7 +62,7 @@ export class UserData {
         }
     }
 
-    public searchUsers = async (numPage: any, userData: any) => {
+    public searchInformation = async (numPage: any, userData: any) => {
         try {
             if (userData.tipoUsuario.toLowerCase() == "cliente") {
                 const distributors = await connection("usuario").select(
@@ -78,8 +78,8 @@ export class UserData {
                     .where("usuario.tipoUsuario", "LIKE", "distribuidora")
                     .limit(10)
                     .offset((parseInt(numPage) - 1) * 10);
-    
-                return distributors;            
+
+                return distributors;
             }
             else {
                 const customers = await connection.select(
@@ -92,10 +92,46 @@ export class UserData {
                     .where("usuario.tipoUsuario", "LIKE", "cliente")
                     .limit(10)
                     .offset((parseInt(numPage) - 1) * 10);
-    
+
                 return customers;
             }
-        } catch(err: any) {
+        } catch (err: any) {
+            throw new Error(err.message);
+        }
+    }
+
+    public checkIdPerfil = async (idUsuario: any) => {
+        try {
+            const profileType = await connection.select("tipoUsuario").from("usuario").where({ idUsuario });
+
+            return profileType;
+
+        } catch (err: any) {
+            throw new Error(err.message);
+        }
+    }
+
+    public getProfileInformation = async (idUsuario: any) => {
+        try {
+            const infoUser = await connection("usuario")
+                .select(
+                    "usuario.telefoneCelular",
+                    "usuario.nome",
+                    "produto.*",
+                    "usuario.imagemDoUsuario",
+                    "usuario.descricao"
+                )
+                .innerJoin("usuario_produto", "usuario.idUsuario", "usuario_produto.idUsuario")
+                .innerJoin("produto", "usuario_produto.idProduto", "produto.idProduto")
+                .where("usuario.idUsuario", idUsuario);
+            
+            const addressUser = await connection("endereco")
+                .select("*")
+                .where("endereco.idUsuario", idUsuario);
+            
+            return [infoUser, addressUser];
+
+        } catch (err: any) {
             throw new Error(err.message);
         }
     }

@@ -8,7 +8,7 @@ export class ProductBusiness {
 
     constructor(private productData: productsData) {}
 
-    addProduct = async (token: any, productData: any) => {
+    public addProduct = async (token: any, productData: any) => {
         try {
             const { descricao, valorUnidade, nomeComercial, nomeTecnico, peso, material, dimensoes, fabricante } = productData;
 
@@ -18,11 +18,7 @@ export class ProductBusiness {
 
             const tokenData: TokenData = TokenUtils.getTokenInformation(token);
 
-            if( !tokenData ) {
-                throw new CustomError("Token inválido", 400);
-            }
-
-            if( tokenData.tipoUsuario !== "distribuidora") {
+            if( tokenData.tipoUsuario.toLowerCase() !== "distribuidora") {
                 throw new CustomError("Usuário não tem permissão para adicionar produto", 403);
             }
 
@@ -34,16 +30,60 @@ export class ProductBusiness {
         }
     }
 
-    editProduct = async () => {
+    public editProduct = async (token: any, idProduct: any, productData: any) => {
         try {
-            
+            const { descricao, valorUnidade, nomeComercial, nomeTecnico, peso, material, dimensoes, fabricante, statusProduto } = productData;
+
+            if( !descricao && !valorUnidade && !nomeComercial && !nomeTecnico && !peso && !material && !dimensoes && !fabricante && !statusProduto ) {
+                throw new CustomError("Nehnum dado foi recebido para alterar o produto", 400);
+            }
+        
+            const tokenData: TokenData = TokenUtils.getTokenInformation(token);
+
+            if( tokenData.tipoUsuario.toLowerCase() !== "distribuidora" ) {
+                throw new CustomError("Usuário não é distribuidora", 403);
+            }
+
+            const queryResponse = await this.productData.productExists(idProduct);
+
+            if( queryResponse.length < 1 ) {
+                throw new CustomError("Produto não existe", 400);
+            }
+
+            const queryResponse2 = await this.productData.checkPermission(tokenData.idUsuario, idProduct);
+
+            if( queryResponse2.length < 1 ) {
+                throw new CustomError("Usuário não tem permissão para editar o produto", 400);
+            }
+
+            await this.productData.changeProduct(productData, idProduct);
+
         } catch(err: any) {
             throw new CustomError(err.message, err.statusCode);
         }
     }
 
-    deleteProduct = async () => {
+    public deleteProduct = async (token: any, idProduct: any) => {
         try {
+            const tokenData: TokenData = TokenUtils.getTokenInformation(token);
+
+            if( tokenData.tipoUsuario.toLowerCase() !== "distribuidora" ) {
+                throw new CustomError("Usuário não é distribuidora", 403);
+            }
+
+            const queryResponse = await this.productData.productExists(idProduct);
+
+            if( queryResponse.length < 1 ) {
+                throw new CustomError("Produto não existe", 400);
+            }
+
+            const queryResponse2 = await this.productData.checkPermission(tokenData.idUsuario, idProduct);
+
+            if( queryResponse2.length < 1 ) {
+                throw new CustomError("Usuário não tem permissão para excluir o produto", 400);
+            }
+
+            await this.productData.deleteProduct(idProduct);
             
         } catch(err: any) {
             throw new CustomError(err.message, err.statusCode);

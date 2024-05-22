@@ -5,10 +5,11 @@ export class ProductsController {
 
     constructor(private productBusiness: ProductBusiness) {}
 
-    addProduct = async (req: Request, res: Response) => {
+    public addProduct = async (req: Request, res: Response) => {
         try {
             const token = req.headers.authorization;
             const productData = req.body;
+            
             await this.productBusiness.addProduct(token, productData);
             
             res.status(200).send("Produto cadastrado!");
@@ -17,16 +18,29 @@ export class ProductsController {
         }
     }
 
-    editProduct = async (req: Request, res: Response) => {
+    public editProduct = async (req: Request, res: Response) => {
         try {
+            const token = req.headers.authorization;
+            const idProduct = req.params.idProduto;
+            const productData = req.body;
+
+            await this.productBusiness.editProduct(token, idProduct, productData);
+
+            res.status(200).send();
 
         } catch(err: any) {
             res.status(err.statusCode || 500).send(err.message);
         }
     }
 
-    deleteProduct = async (req: Request, res: Response) => {
+    public deleteProduct = async (req: Request, res: Response) => {
         try {
+            const token = req.headers.authorization;
+            const idProduct =req.params.idProduto;
+            
+            await this.productBusiness.deleteProduct(token, idProduct);
+
+            res.status(200).send();
 
         } catch(err: any) {
             res.status(err.statusCode || 500).send(err.message);

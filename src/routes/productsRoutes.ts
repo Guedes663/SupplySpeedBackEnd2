@@ -10,7 +10,7 @@ const productsBusiness = new ProductBusiness(productData);
 const productsController = new ProductsController(productsBusiness);
 
 productsRoutes.post("/addProduct", productsController.addProduct);
-productsRoutes.put("/editProduct", productsController.editProduct);
-productsRoutes.delete("/deleteProduct", productsController.deleteProduct);
+productsRoutes.put("/editProduct/:idProduto", productsController.editProduct);
+productsRoutes.delete("/deleteProduct/:idProduto", productsController.deleteProduct);
 
 export { productsRoutes };
