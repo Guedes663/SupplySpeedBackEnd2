@@ -24,9 +24,9 @@ export class ProductsController {
             const idProduct = req.params.idProduto;
             const productData = req.body;
 
-            await this.productBusiness.editProduct(token, idProduct, productData);
+            const response = await this.productBusiness.editProduct(token, idProduct, productData);
 
-            res.status(200).send();
+            res.status(200).send(response);
 
         } catch(err: any) {
             res.status(err.statusCode || 500).send(err.message);

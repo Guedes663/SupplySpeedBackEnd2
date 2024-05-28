@@ -58,6 +58,8 @@ export class ProductBusiness {
 
             await this.productData.changeProduct(productData, idProduct);
 
+            return "Produto modificado com sucesso!";
+
         } catch(err: any) {
             throw new CustomError(err.message, err.statusCode);
         }

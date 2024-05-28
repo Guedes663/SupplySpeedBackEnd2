@@ -67,13 +67,13 @@ export class productsData {
         try {
             const { descricao, valorUnidade, nomeComercial, nomeTecnico, peso, material, dimensoes, fabricante, statusProduto } = productData;
 
-            if (descricao && valorUnidade && nomeComercial && nomeTecnico && peso
-                && material && dimensoes && fabricante && statusProduto) {
+            //if (descricao && valorUnidade && nomeComercial && nomeTecnico && peso
+            //    && material && dimensoes && fabricante && statusProduto) {
                 await connection("produto")
                     .where({ idProduto })
                     .update({ descricao, valorUnidade, nomeComercial, nomeTecnico, peso, material, dimensoes, fabricante, statusProduto });
-            }
-            else {
+            //}
+           /* else {
                 if (descricao) {
                     await connection("produto")
                         .where({ idProduto })
@@ -127,7 +127,7 @@ export class productsData {
                         .where({ idProduto })
                         .update({ statusProduto });
                 }
-            }
+            } */
 
         } catch (err: any) {
             throw new Error(err.message);
