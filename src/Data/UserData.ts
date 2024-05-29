@@ -69,13 +69,13 @@ export class UserData {
                     "usuario.nome",
                     "usuario.descricao as usuario_descricao",
                     "endereco.*",
-                    "produto.*",
-                    "produto.descricao as produto_descricao"
+                    //"produto.*",
+                    //"produto.descricao as produto_descricao"
                 )
                     .from("usuario")
                     .innerJoin("endereco", "usuario.idUsuario", "endereco.idUsuario")
-                    .innerJoin("usuario_produto", "usuario.idUsuario", "usuario_produto.idUsuario")
-                    .innerJoin("produto", "usuario_produto.idProduto", "produto.idProduto")
+                    //.innerJoin("usuario_produto", "usuario.idUsuario", "usuario_produto.idUsuario")
+                    //.innerJoin("produto", "usuario_produto.idProduto", "produto.idProduto")
                     .where("usuario.tipoUsuario", "LIKE", "distribuidora")
                     .limit(10)
                     .offset((parseInt(numPage) - 1) * 10);
