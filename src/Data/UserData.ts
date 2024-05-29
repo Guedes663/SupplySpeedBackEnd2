@@ -67,9 +67,10 @@ export class UserData {
             if (userData.tipoUsuario.toLowerCase() == "cliente") {
                 const distributors = await connection("usuario").select(
                     "usuario.nome",
-                    "usuario.descricao",
+                    "usuario.descricao as usuario_descricao",
                     "endereco.*",
-                    "produto.*"
+                    "produto.*",
+                    "produto.descricao as produto_descricao"
                 )
                     .from("usuario")
                     .innerJoin("endereco", "usuario.idUsuario", "endereco.idUsuario")
