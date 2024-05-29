@@ -67,7 +67,7 @@ export class UserData {
             if (userData.tipoUsuario.toLowerCase() == "cliente") {
                 const distributors = await connection("usuario").select(
                     "usuario.nome",
-                    "usuario.descricao as usuario_descricao",
+                    "usuario.descricao",
                     "endereco.*",
                     //"produto.*",
                     //"produto.descricao as produto_descricao"
