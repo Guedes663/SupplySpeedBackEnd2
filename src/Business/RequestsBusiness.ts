@@ -22,7 +22,7 @@ export class RequestsBusiness {
 
     public sendRequest = async (token: any, orderData: any) => {
         try {
-            const { idDistribuidora, dataEntrega, idEndereco, arrayProdutos } = orderData;
+            const { idDistribuidora, dataHora, idEndereco, arrayProdutos } = orderData;
 
             const response = await this.requestData.distributorCheck(idDistribuidora);
 
@@ -48,7 +48,7 @@ export class RequestsBusiness {
 
             }
 
-            const dateToValidate = moment(dataEntrega);
+            const dateToValidate = moment(dataHora);
             const today = moment().startOf('day');
 
             const isTodayOrAfter = dateToValidate.isSameOrAfter(today, 'day');
@@ -70,7 +70,7 @@ export class RequestsBusiness {
             }
 
             const idPedido = v4();
-            await this.requestData.sendRequest(idPedido, dataEntrega, idEndereco, idDistribuidora, tokenData.idUsuario, arrayProdutos);
+            await this.requestData.sendRequest(idPedido, dataHora, idEndereco, idDistribuidora, tokenData.idUsuario, arrayProdutos);
 
         } catch (err: any) {
             throw new CustomError(err.message, err.statusCode);

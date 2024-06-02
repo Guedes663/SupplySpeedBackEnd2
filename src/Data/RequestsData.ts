@@ -7,7 +7,7 @@ export class RequestsData {
             if (userData.tipoUsuario.toLowerCase() === "cliente") {
                 const ordersShipped = await connection("usuario_pedido").select(
                     "usuario.nome",
-                    "pedido.dataEntrega",
+                    "pedido.dataHora",
                     "pedido.statusPedido",
                     "endereco.estado",
                     "endereco.cidade",
@@ -38,7 +38,7 @@ export class RequestsData {
             else {
                 const ordersReceived = await connection("usuario_pedido").select(
                     "usuario.nome",
-                    "pedido.dataEntrega",
+                    "pedido.dataHora",
                     "pedido.statusPedido",
                     "endereco.estado",
                     "endereco.cidade",
@@ -110,13 +110,13 @@ export class RequestsData {
         }
     }
 
-    public sendRequest = async (idPedido: any, dataEntrega: any, idEndereco: any, idDistribuidora: any, idCliente: any, arrayProdutos: any) => {
+    public sendRequest = async (idPedido: any, dataHora: any, idEndereco: any, idDistribuidora: any, idCliente: any, arrayProdutos: any) => {
         try {
             await connection("pedido")
                 .insert({
                     idPedido,
                     statusPedido: "Em análise",
-                    dataEntrega,
+                    dataHora,
                     idEndereco
                 });
 

@@ -59,7 +59,7 @@ export class productsData {
                 .update({ statusProduto: 0 });
 
 
-        } catch (err: any) { 
+        } catch (err: any) {
             throw new Error(err.message);
         }
     }
@@ -67,67 +67,9 @@ export class productsData {
         try {
             const { descricao, valorUnidade, nomeComercial, nomeTecnico, peso, material, dimensoes, fabricante, statusProduto } = productData;
 
-            //if (descricao && valorUnidade && nomeComercial && nomeTecnico && peso
-            //    && material && dimensoes && fabricante && statusProduto) {
-                await connection("produto")
-                    .where({ idProduto })
-                    .update({ descricao, valorUnidade, nomeComercial, nomeTecnico, peso, material, dimensoes, fabricante, statusProduto });
-            //}
-           /* else {
-                if (descricao) {
-                    await connection("produto")
-                        .where({ idProduto })
-                        .update({ descricao });
-
-                }
-                if (valorUnidade) {
-                    await connection("produto")
-                        .where({ idProduto })
-                        .update({ valorUnidade });
-
-                }
-                if (nomeComercial) {
-                    await connection("produto")
-                        .where({ idProduto })
-                        .update({ nomeComercial });
-
-                }
-                if (nomeTecnico) {
-                    await connection("produto")
-                        .where({ idProduto })
-                        .update({ nomeTecnico });
-
-                }
-                if (peso) {
-                    await connection("produto")
-                        .where({ idProduto })
-                        .update({ peso });
-
-                }
-                if (material) {
-                    await connection("produto")
-                        .where({ idProduto })
-                        .update({ material });
-
-                }
-                if (dimensoes) {
-                    await connection("produto")
-                        .where({ idProduto })
-                        .update({ dimensoes });
-
-                }
-                if (fabricante) {
-                    await connection("produto")
-                        .where({ idProduto })
-                        .update({ fabricante });
-
-                }
-                if(statusProduto) {
-                    await connection("produto")
-                        .where({ idProduto })
-                        .update({ statusProduto });
-                }
-            } */
+            await connection("produto")
+                .where({ idProduto })
+                .update({ descricao, valorUnidade, nomeComercial, nomeTecnico, peso, material, dimensoes, fabricante, statusProduto });
 
         } catch (err: any) {
             throw new Error(err.message);
