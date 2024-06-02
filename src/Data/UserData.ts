@@ -31,10 +31,16 @@ export class UserData {
                 tipoUsuario,
                 cnpj_cpf,
                 descricao,
-                telefoneCelular
+                telefoneCelular,
+                estado,
+                cidade,
+                bairro,
+                rua,
+                numero,
+                cep
             });
 
-            await connection("endereco").insert({
+            /*await connection("endereco").insert({
                 estado,
                 cidade,
                 bairro,
@@ -42,7 +48,7 @@ export class UserData {
                 numero,
                 cep,
                 idUsuario
-            });
+            }); */
 
         } catch (err: any) {
             throw new Error(err.message);
@@ -68,12 +74,18 @@ export class UserData {
                 const distributors = await connection("usuario").select(
                     "usuario.nome",
                     "usuario.descricao",
-                    "endereco.*",
+                    "usuario.estado",
+                    "usuario.cidade",
+                    "usuario.bairro",
+                    "usuario.rua",
+                    "usuario.numero",
+                    "usuario.cep"
+                    //"endereco.*",
                     //"produto.*",
                     //"produto.descricao as produto_descricao"
                 )
-                    .from("usuario")
-                    .innerJoin("endereco", "usuario.idUsuario", "endereco.idUsuario")
+                    //.from("usuario")
+                    //.innerJoin("endereco", "usuario.idUsuario", "endereco.idUsuario")
                     //.innerJoin("usuario_produto", "usuario.idUsuario", "usuario_produto.idUsuario")
                     //.innerJoin("produto", "usuario_produto.idProduto", "produto.idProduto")
                     .where("usuario.tipoUsuario", "LIKE", "distribuidora")
@@ -86,10 +98,16 @@ export class UserData {
                 const customers = await connection.select(
                     "usuario.nome",
                     "usuario.descricao",
-                    "endereco.*"
+                    "usuario.estado",
+                    "usuario.cidade",
+                    "usuario.bairro",
+                    "usuario.rua",
+                    "usuario.numero",
+                    "usuario.cep"
+                    //"endereco.*"
                 )
-                    .from("usuario")
-                    .innerJoin("endereco", "usuario.idUsuario", "endereco.idUsuario")
+                    //.from("usuario")
+                    //.innerJoin("endereco", "usuario.idUsuario", "endereco.idUsuario")
                     .where("usuario.tipoUsuario", "LIKE", "cliente")
                     .limit(10)
                     .offset((parseInt(numPage) - 1) * 10);
@@ -119,18 +137,25 @@ export class UserData {
                     "usuario.telefoneCelular",
                     "usuario.nome",
                     "produto.*",
-                    "usuario.imagemDoUsuario",
-                    "usuario.descricao"
+                    //"usuario.imagemDoUsuario",
+                    "usuario.descricao",
+                    "usuario.estado",
+                    "usuario.cidade",
+                    "usuario.bairro",
+                    "usuario.rua",
+                    "usuario.numero",
+                    "usuario.cep"
                 )
                 .innerJoin("usuario_produto", "usuario.idUsuario", "usuario_produto.idUsuario")
                 .innerJoin("produto", "usuario_produto.idProduto", "produto.idProduto")
                 .where("usuario.idUsuario", idUsuario);
-            
-            const addressUser = await connection("endereco")
+
+            /*const addressUser = await connection("endereco")
                 .select("*")
                 .where("endereco.idUsuario", idUsuario);
-            
-            return [infoUser, addressUser];
+            */
+
+            return infoUser;
 
         } catch (err: any) {
             throw new Error(err.message);

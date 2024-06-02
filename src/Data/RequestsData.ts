@@ -9,12 +9,12 @@ export class RequestsData {
                     "usuario.nome",
                     "pedido.dataHora",
                     "pedido.statusPedido",
-                    "endereco.estado",
-                    "endereco.cidade",
-                    "endereco.bairro",
-                    "endereco.rua",
-                    "endereco.numero",
-                    "endereco.cep",
+                    "usuario.estado",
+                    "usuario.cidade",
+                    "usuario.bairro",
+                    "usuario.rua",
+                    "usuario.numero",
+                    "usuario.cep",
                     "pedido_produto.quantidade",
                     "produto.descricao",
                     "produto.valorUnidade",
@@ -28,7 +28,7 @@ export class RequestsData {
                     .from("usuario_pedido")
                     .innerJoin("usuario", "usuario_pedido.idUsuarioDestinatario", "usuario.idUsuario")
                     .innerJoin("pedido", "usuario_pedido.idPedido", "pedido.idPedido")
-                    .innerJoin("endereco", "pedido.idEndereco", "endereco.idEndereco")
+                    //.innerJoin("endereco", "pedido.idEndereco", "endereco.idEndereco")
                     .innerJoin("pedido_produto", "pedido.idPedido", "pedido_produto.idPedido")
                     .innerJoin("produto", "pedido_produto.idProduto", "produto.idProduto")
                     .where("usuario_pedido.idUsuarioRemetente", userData.idUsuario);
@@ -40,12 +40,12 @@ export class RequestsData {
                     "usuario.nome",
                     "pedido.dataHora",
                     "pedido.statusPedido",
-                    "endereco.estado",
-                    "endereco.cidade",
-                    "endereco.bairro",
-                    "endereco.rua",
-                    "endereco.numero",
-                    "endereco.cep",
+                    "usuario.estado",
+                    "usuario.cidade",
+                    "usuario.bairro",
+                    "usuario.rua",
+                    "usuario.numero",
+                    "usuario.cep",
                     "pedido_produto.quantidade",
                     "produto.descricao",
                     "produto.valorUnidade",
@@ -59,7 +59,7 @@ export class RequestsData {
                     .from("usuario_pedido")
                     .innerJoin("usuario", "usuario_pedido.idUsuarioRemetente", "usuario.idUsuario")
                     .innerJoin("pedido", "usuario_pedido.idPedido", "pedido.idPedido")
-                    .innerJoin("endereco", "pedido.idEndereco", "endereco.idEndereco")
+                    //.innerJoin("endereco", "pedido.idEndereco", "endereco.idEndereco")
                     .innerJoin("pedido_produto", "pedido.idPedido", "pedido_produto.idPedido")
                     .innerJoin("produto", "pedido_produto.idProduto", "produto.idProduto")
                     .where("usuario_pedido.idUsuarioDestinatario", userData.idUsuario);
@@ -110,14 +110,14 @@ export class RequestsData {
         }
     }
 
-    public sendRequest = async (idPedido: any, dataHora: any, idEndereco: any, idDistribuidora: any, idCliente: any, arrayProdutos: any) => {
+    public sendRequest = async (idPedido: any, dataHora: any, /*idEndereco: any,*/ idDistribuidora: any, idCliente: any, arrayProdutos: any) => {
         try {
             await connection("pedido")
                 .insert({
                     idPedido,
                     statusPedido: "Em análise",
                     dataHora,
-                    idEndereco
+                    //idEndereco
                 });
 
             await connection("usuario_pedido")

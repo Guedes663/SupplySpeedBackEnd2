@@ -10,7 +10,7 @@ export class UserController {
             const registrationData = req.body;
             const token = await this.userBusiness.registerUser(registrationData);
 
-            res.status(200).send(token);
+            res.status(201).send(token);
 
         } catch (err: any) {
             res.status(err.statusCode || 500).send(err.message);

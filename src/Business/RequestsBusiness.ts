@@ -2,7 +2,7 @@ import { RequestsData } from "../Data/RequestsData";
 import { CustomError } from "../utils/CustomError";
 import { TokenUtils } from "../utils/TokenUtils";
 import moment from 'moment';
-import { v4 } from "uuid";
+import { uuidv7 as v7 } from '@kripod/uuidv7';
 
 export class RequestsBusiness {
 
@@ -22,7 +22,7 @@ export class RequestsBusiness {
 
     public sendRequest = async (token: any, orderData: any) => {
         try {
-            const { idDistribuidora, dataHora, idEndereco, arrayProdutos } = orderData;
+            const { idDistribuidora, dataHora, /*idEndereco,*/ arrayProdutos } = orderData;
 
             const response = await this.requestData.distributorCheck(idDistribuidora);
 
@@ -57,11 +57,11 @@ export class RequestsBusiness {
                 throw new CustomError("A data passada não é válida", 400);
             }
 
-            const response3 = await this.requestData.checkAddress(idEndereco);
+            //const response3 = await this.requestData.checkAddress(idEndereco);
 
-            if (response3.length < 1) {
-                throw new CustomError("O endereço passado não existe", 400);
-            }
+            //if (response3.length < 1) {
+            //    throw new CustomError("O endereço passado não existe", 400);
+            //}
 
             const tokenData = TokenUtils.getTokenInformation(token);
 
@@ -69,8 +69,8 @@ export class RequestsBusiness {
                 throw new CustomError("O usuário não é um cliente, portanto não pode fazer um pedido a uma distribuidora", 400);
             }
 
-            const idPedido = v4();
-            await this.requestData.sendRequest(idPedido, dataHora, idEndereco, idDistribuidora, tokenData.idUsuario, arrayProdutos);
+            const idPedido = v7();
+            await this.requestData.sendRequest(idPedido, dataHora, /*idEndereco,*/ idDistribuidora, tokenData.idUsuario, arrayProdutos);
 
         } catch (err: any) {
             throw new CustomError(err.message, err.statusCode);

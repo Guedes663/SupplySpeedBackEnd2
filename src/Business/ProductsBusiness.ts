@@ -2,7 +2,7 @@ import { productsData } from "../Data/ProductsData";
 import { TokenData } from "../models/Token";
 import { CustomError } from "../utils/CustomError";
 import { TokenUtils } from "../utils/TokenUtils";
-import { v4 } from "uuid";
+import { uuidv7 as v7 } from '@kripod/uuidv7';
 
 export class ProductBusiness {
 
@@ -22,7 +22,7 @@ export class ProductBusiness {
                 throw new CustomError("Usuário não tem permissão para adicionar produto", 403);
             }
 
-            const idProduct = v4();
+            const idProduct = v7();
             await this.productData.addProduct(productData, tokenData.idUsuario, idProduct);
 
         } catch(err: any) {

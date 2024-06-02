@@ -1,7 +1,7 @@
 import { UserData } from "../Data/UserData";
 import { CustomError } from "../utils/CustomError";
 import { TokenUtils } from "../utils/TokenUtils";
-import { v4 } from "uuid";
+import { uuidv7 as v7} from '@kripod/uuidv7';
 
 export class UserBusiness {
 
@@ -11,7 +11,7 @@ export class UserBusiness {
         try {
             const { nome, email, senha, tipoUsuario, cnpj_cpf, descricao, telefoneCelular, estado, cidade, bairro, rua, numero, cep } = registrationData;
 
-            if (!nome || !email || !senha || !tipoUsuario || !cnpj_cpf || !descricao || !telefoneCelular) {
+            if (!nome || !email || !senha || !tipoUsuario || !cnpj_cpf || !descricao || !telefoneCelular || !estado || !cidade || !bairro || !rua || !numero || !cep) {
                 throw new CustomError("'nome', 'email', 'senha', 'tipoUsuario', 'cnpj_cpf', 'descricao', 'telefoneCelular', 'estado', 'cidade', 'bairro', 'rua', 'numero' e 'cep' são obrigatórios", 400);
             }
 
@@ -23,24 +23,24 @@ export class UserBusiness {
 
             if (dataChecked.length > 0) {
                 if (dataChecked[0].nome === nome) {
-                    throw new CustomError("nome de usuário já cadastrado", 400);
+                    throw new CustomError("nome de usuário já cadastrado", 409);
                 }
                 else if (dataChecked[0].email === email) {
-                    throw new CustomError("Email já cadastrado", 400);
+                    throw new CustomError("Email já cadastrado", 409);
                 }
                 else if (dataChecked[0].cnpj_cpf === cnpj_cpf) {
-                    throw new CustomError("cnpj_cpf já cadastrado", 400);
+                    throw new CustomError("cnpj_cpf já cadastrado", 409);
                 }
                 else if (dataChecked[0].telefoneCelular === telefoneCelular) {
-                    throw new CustomError("telefone/celular já cadastrado", 400);
+                    throw new CustomError("telefone/celular já cadastrado", 409);
                 }
             }
 
-            const idUsuario = v4();
+            const idUsuario = v7();
 
             await this.userData.registerUser(registrationData, idUsuario);
 
-            const token = TokenUtils.generateToken({ idUsuario, email, senha, tipoUsuario });
+            const token = TokenUtils.generateToken({ idUsuario, email, senha, tipoUsuario, estado, cidade, bairro, rua, numero, cep });
             return token;
 
         } catch (err: any) {
@@ -59,7 +59,7 @@ export class UserBusiness {
             const result = await this.userData.authenticateUser(email, senha);
 
             if (result.length === 0) {
-                throw new CustomError("Email ou senha incorreto!", 400);
+                throw new CustomError("Email ou senha incorreto!", 401);
             }
 
             const { idUsuario, tipoUsuario } = result[0];
