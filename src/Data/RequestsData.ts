@@ -116,7 +116,7 @@ export class RequestsData {
                 .insert({
                     idPedido,
                     statusPedido: "Em análise",
-                    dataHora,
+                    dataHora
                     //idEndereco
                 });
 

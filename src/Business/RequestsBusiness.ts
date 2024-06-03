@@ -48,13 +48,11 @@ export class RequestsBusiness {
 
             }
 
-            const dateToValidate = moment(dataHora);
-            const today = moment().startOf('day');
+            const dateToValidate = moment(dataHora, 'DD/MM/YYYY_HH:mm');
+            const isTodayOrAfter = dateToValidate.isValid() && dateToValidate.isSameOrAfter(moment().startOf('day'));
 
-            const isTodayOrAfter = dateToValidate.isSameOrAfter(today, 'day');
-
-            if (!isTodayOrAfter) {
-                throw new CustomError("A data passada não é válida", 400);
+            if (!isTodayOrAfter || !dataHora) {
+                throw new CustomError("A dataHora não foi passada ou não é válida", 400);
             }
 
             //const response3 = await this.requestData.checkAddress(idEndereco);
@@ -183,13 +181,13 @@ export class RequestsBusiness {
     public cancelRequest = async (token: any, idPedido: any) => {
         try {
             const tokenData = TokenUtils.getTokenInformation(token);
-            
+
             if (tokenData.tipoUsuario.toLowerCase() !== "cliente") {
                 throw new CustomError("Somente clientes podem cancelar pedidos", 400);
             }
 
             const response = await this.requestData.checkRequest(idPedido);
-            
+
             if (response.length < 1) {
                 throw new CustomError("O pedido que você está tentando cancelar não existe", 400);
             }
