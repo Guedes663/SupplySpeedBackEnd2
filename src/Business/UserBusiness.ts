@@ -40,7 +40,7 @@ export class UserBusiness {
 
             await this.userData.registerUser(registrationData, idUsuario);
 
-            const token = TokenUtils.generateToken({ idUsuario, email, senha, tipoUsuario, estado, cidade, bairro, rua, numero, cep });
+            const token = TokenUtils.generateToken({ idUsuario, email, senha, tipoUsuario });
             return token;
 
         } catch (err: any) {
@@ -93,8 +93,8 @@ export class UserBusiness {
 
             const profileType = await this.userData.checkIdPerfil(idProfile);
 
-            if (profileType.length < 1 || profileType[0].tipoUsuario !== "distribuidora") {
-                throw new CustomError("Usuário não é distribuidora ou não existe", 400);
+            if (profileType.length < 1 /*|| profileType[0].tipoUsuario !== "distribuidora"*/) {
+                throw new CustomError("O id do usuário que você passou não existe", 400);
             }
 
             const profileInformation = await this.userData.getProfileInformation(idProfile);

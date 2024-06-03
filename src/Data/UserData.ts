@@ -122,7 +122,7 @@ export class UserData {
 
     public checkIdPerfil = async (idUsuario: any) => {
         try {
-            const profileType = await connection.select("tipoUsuario").from("usuario").where({ idUsuario });
+            const profileType = await connection.select("*").from("usuario").where({ idUsuario });
 
             return profileType;
 
