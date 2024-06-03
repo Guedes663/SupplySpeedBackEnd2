@@ -11,7 +11,7 @@ const userController = new UserController(userBusiness);
 
 userRoutes.post("/signup", userController.registerUser);
 userRoutes.post("/login", userController.login);
-userRoutes.get("/searchInformation/:numPage", userController.searchInformation);
-userRoutes.get("/getProfileInformation/:idProfile", userController.getProfileInformation);
+userRoutes.get("/search/:numPage", userController.searchInformation);
+userRoutes.get("/profile/:idProfile", userController.getProfileInformation);
 
 export { userRoutes };

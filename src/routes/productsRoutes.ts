@@ -9,8 +9,8 @@ const productData = new productsData();
 const productsBusiness = new ProductBusiness(productData);
 const productsController = new ProductsController(productsBusiness);
 
-productsRoutes.post("/addProduct", productsController.addProduct);
-productsRoutes.put("/editProduct/:idProduto", productsController.editProduct);
-productsRoutes.delete("/deleteProduct/:idProduto", productsController.deleteProduct);
+productsRoutes.post("/add", productsController.addProduct);
+productsRoutes.put("/edit/:idProduto", productsController.editProduct);
+productsRoutes.delete("/delete/:idProduto", productsController.deleteProduct);
 
 export { productsRoutes };

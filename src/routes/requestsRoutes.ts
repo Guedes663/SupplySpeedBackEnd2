@@ -9,11 +9,11 @@ const requestsData = new RequestsData();
 const requestsBusiness = new RequestsBusiness(requestsData);
 const requestsController = new RequestsController(requestsBusiness);
 
-requestsRoutes.get("/searchOrders", requestsController.searchOrders);
-requestsRoutes.post("/sendRequest", requestsController.sendRequest);
-requestsRoutes.put("/acceptRequest/:idPedido", requestsController.acceptRequest);
-requestsRoutes.put("/rejectRequest/:idPedido", requestsController.rejectRequest);
-requestsRoutes.put("/requestDelivered/:idPedido", requestsController.requestDelivered);
-requestsRoutes.delete("/cancelRequest/:idPedido", requestsController.cancelRequest);
+requestsRoutes.get("/search", requestsController.searchOrders);
+requestsRoutes.post("/send", requestsController.sendRequest);
+requestsRoutes.put("/accept/:idPedido", requestsController.acceptRequest);
+requestsRoutes.put("/reject/:idPedido", requestsController.rejectRequest);
+requestsRoutes.put("/request/:idPedido", requestsController.requestDelivered);
+requestsRoutes.delete("/cancel/:idPedido", requestsController.cancelRequest);
 
 export { requestsRoutes };
