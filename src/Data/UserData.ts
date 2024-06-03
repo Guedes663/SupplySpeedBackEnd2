@@ -133,7 +133,7 @@ export class UserData {
 
     public getProfileInformation = async (idUsuario: any) => {
         try {
-            const infoUser = await connection("usuario")
+            let infoUser = await connection("usuario")
                 .select(
                     "usuario.telefoneCelular",
                     "usuario.nome",
@@ -151,6 +151,23 @@ export class UserData {
                 .innerJoin("produto", "usuario_produto.idProduto", "produto.idProduto")
                 .where("usuario.idUsuario", idUsuario);
 
+            if (infoUser.length === 0) {
+                infoUser = await connection("usuario")
+                    .select(
+                        "usuario.telefoneCelular",
+                        "usuario.nome",
+                        //"produto.*",
+                        //"usuario.imagemDoUsuario",
+                        "usuario.descricao",
+                        "usuario.estado",
+                        "usuario.cidade",
+                        "usuario.bairro",
+                        "usuario.rua",
+                        "usuario.numero",
+                        "usuario.cep"
+                    )
+                    .where("usuario.idUsuario", idUsuario);
+            }
             /*const addressUser = await connection("endereco")
                 .select("*")
                 .where("endereco.idUsuario", idUsuario);
