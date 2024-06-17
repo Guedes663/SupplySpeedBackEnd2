@@ -2,10 +2,14 @@ import { UserData } from "../Data/UserData";
 import { CustomError } from "../utils/CustomError";
 import { TokenUtils } from "../utils/TokenUtils";
 import { uuidv7 as v7} from '@kripod/uuidv7';
+import { HashManager } from "../utils/HashManager";
 
 export class UserBusiness {
 
-    constructor(private userData: UserData) { }
+    constructor(
+        private userData: UserData,
+        private hashManager = new HashManager()
+    ) { }
 
     public registerUser = async (registrationData: any) => {
         try {
@@ -37,6 +41,7 @@ export class UserBusiness {
             }
 
             const idUsuario = v7();
+            registrationData.senha = await this.hashManager.hashPassword(senha);
 
             await this.userData.registerUser(registrationData, idUsuario);
 
@@ -55,11 +60,17 @@ export class UserBusiness {
             if (!email || !senha) {
                 throw new CustomError("Email ou senha não foi recebido!", 400);
             }
-
-            const result = await this.userData.authenticateUser(email, senha);
+            
+            const result = await this.userData.authenticateUser(email);
 
             if (result.length === 0) {
-                throw new CustomError("Email ou senha incorreto!", 401);
+                throw new CustomError("Email incorreto!", 401);
+            }
+
+            const correctPassword = await this.hashManager.comparePassword(senha, result[0].senha);
+
+            if ( !correctPassword ) {
+                throw new CustomError("Senha incorreta!", 401);
             }
 
             const { idUsuario, tipoUsuario } = result[0];

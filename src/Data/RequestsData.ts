@@ -7,6 +7,7 @@ export class RequestsData {
             if (userData.tipoUsuario.toLowerCase() === "cliente") {
                 const ordersShipped = await connection("usuario_pedido").select(
                     "usuario.nome",
+                    "pedido.idPedido",
                     "pedido.dataHora",
                     "pedido.statusPedido",
                     "usuario.estado",

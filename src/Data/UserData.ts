@@ -20,7 +20,6 @@ export class UserData {
 
     public registerUser = async (data: any, idUsuario: string) => {
         try {
-
             const { nome, email, senha, tipoUsuario, cnpj_cpf, descricao, telefoneCelular, estado, cidade, bairro, rua, numero, cep } = data;
 
             await connection("usuario").insert({
@@ -55,11 +54,11 @@ export class UserData {
         }
     }
 
-    public authenticateUser = async (email: string, senha: any) => {
+    public authenticateUser = async (email: string) => {
         try {
             const queryData = await connection("usuario")
-                .select('idUsuario', 'email', 'senha', 'tipoUsuario')
-                .where({ email, senha });
+                .select( 'senha', 'idUsuario', 'tipoUsuario' )
+                .where({ email });
 
             return queryData;
 
