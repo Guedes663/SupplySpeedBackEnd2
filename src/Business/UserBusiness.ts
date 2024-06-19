@@ -3,6 +3,8 @@ import { CustomError } from "../utils/CustomError";
 import { TokenUtils } from "../utils/TokenUtils";
 import { uuidv7 as v7} from '@kripod/uuidv7';
 import { HashManager } from "../utils/HashManager";
+import { loginModel } from "../models/LoginModel";
+import { RegistrationData } from "../models/RegisterModel";
 
 export class UserBusiness {
 
@@ -11,7 +13,7 @@ export class UserBusiness {
         private hashManager = new HashManager()
     ) { }
 
-    public registerUser = async (registrationData: any) => {
+    public registerUser = async (registrationData: RegistrationData) => {
         try {
             const { nome, email, senha, tipoUsuario, cnpj_cpf, descricao, telefoneCelular, estado, cidade, bairro, rua, numero, cep } = registrationData;
 
@@ -24,6 +26,7 @@ export class UserBusiness {
             }
 
             const dataChecked = await this.userData.checkInfoExist({ nome, email, cnpj_cpf, telefoneCelular });
+            const SenhaForte = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=.*[^\w\d\s]).{8,}$/;
 
             if (dataChecked.length > 0) {
                 if (dataChecked[0].nome === nome) {
@@ -39,6 +42,9 @@ export class UserBusiness {
                     throw new CustomError("telefone/celular já cadastrado", 409);
                 }
             }
+            if (!SenhaForte.test(senha)) {
+                throw new CustomError("A senha não atende aos critérios de segurança. Certifique-se de que ela contenha pelo menos 8 caracteres, incluindo letras maiúsculas, minúsculas, números e caracteres especiais.", 400);
+            }
 
             const idUsuario = v7();
             registrationData.senha = await this.hashManager.hashPassword(senha);
@@ -53,7 +59,7 @@ export class UserBusiness {
         }
     }
 
-    public login = async (loginData: any) => {
+    public login = async (loginData: loginModel) => {
         try {
             const { email, senha } = loginData;
 
@@ -82,7 +88,7 @@ export class UserBusiness {
         }
     }
 
-    public searchInformation = async (numPage: any, token: any) => {
+    public searchInformation = async (numPage: string, token: string) => {
         try {
             if (numPage == "null" || parseInt(numPage) < 1) {
                 throw new CustomError("Número da página está faltando ou não é válido!", 400);
@@ -98,7 +104,7 @@ export class UserBusiness {
         }
     }
 
-    public getProfileInformation = async (token: any, idProfile: any) => {
+    public getProfileInformation = async (token: string, idProfile: string) => {
         try {
             TokenUtils.getTokenInformation(token);
 

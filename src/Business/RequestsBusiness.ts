@@ -3,12 +3,13 @@ import { CustomError } from "../utils/CustomError";
 import { TokenUtils } from "../utils/TokenUtils";
 import moment from 'moment';
 import { uuidv7 as v7 } from '@kripod/uuidv7';
+import { PedidoStatus } from "../types/statusType";
 
 export class RequestsBusiness {
 
     constructor(private requestData: RequestsData) { }
 
-    public searchOrders = async (token: any) => {
+    public searchOrders = async (token: string): Promise<any> => {
         try {
             const tokenData = TokenUtils.getTokenInformation(token);
             const orderData = await this.requestData.searchOrders(tokenData);
@@ -20,9 +21,9 @@ export class RequestsBusiness {
         }
     }
 
-    public sendRequest = async (token: any, orderData: any) => {
+    public SendServiceOrder = async (token: string, orderData: any): Promise<any> => {
         try {
-            const { idDistribuidora, dataHora, /*idEndereco,*/ arrayProdutos } = orderData;
+            const { idDistribuidora, dataHora, arrayProdutos } = orderData;
 
             const response = await this.requestData.distributorCheck(idDistribuidora);
 
@@ -55,12 +56,6 @@ export class RequestsBusiness {
                 throw new CustomError("A dataHora não foi passada ou não é válida", 400);
             }
 
-            //const response3 = await this.requestData.checkAddress(idEndereco);
-
-            //if (response3.length < 1) {
-            //    throw new CustomError("O endereço passado não existe", 400);
-            //}
-
             const tokenData = TokenUtils.getTokenInformation(token);
 
             if (tokenData.tipoUsuario.toLowerCase() !== "cliente") {
@@ -68,117 +63,48 @@ export class RequestsBusiness {
             }
 
             const idPedido = v7();
-            await this.requestData.sendRequest(idPedido, dataHora, /*idEndereco,*/ idDistribuidora, tokenData.idUsuario, arrayProdutos);
+            await this.requestData.SendServiceOrder(idPedido, dataHora, idDistribuidora, tokenData.idUsuario, arrayProdutos);
+
 
         } catch (err: any) {
             throw new CustomError(err.message, err.statusCode);
         }
     }
 
-    public acceptRequest = async (token: any, idPedido: any) => {
+    public async changeStatus(token: string, idPedido: string, newStatus: PedidoStatus): Promise<string> {
         try {
             const tokenData = TokenUtils.getTokenInformation(token);
-
+    
             if (tokenData.tipoUsuario.toLowerCase() !== "distribuidora") {
-                throw new CustomError("Somente distribuidoras podem aceitar pedidos", 400);
+                throw new CustomError("Somente distribuidoras podem mudar o status dos pedidos", 400);
             }
-
+    
             const response = await this.requestData.checkRequest(idPedido);
-
+    
             if (response.length < 1) {
-                throw new CustomError("O pedido que você está tentando aceitar não existe", 400);
+                throw new CustomError("O pedido que você está tentando mudar o status não existe", 400);
             }
-
-            if (response[0].statusPedido.toLowerCase() === "entregue") {
-                throw new CustomError("O pedido não pode ser aceito depois de entrega-lo", 400);
+    
+            if (response[0].statusPedido.toLowerCase() === PedidoStatus.Entregue && newStatus !== PedidoStatus.Entregue) {
+                throw new CustomError("O pedido não pode ter seu status alterado depois de entregue", 400);
             }
-
+    
             const response2 = await this.requestData.checkDistributorRequest(idPedido, tokenData.idUsuario);
-
+    
             if (response2.length < 1) {
                 throw new CustomError("O pedido não pertence a distribuidora", 400);
             }
-
-            await this.requestData.changesStatusAccepted(idPedido);
-
-            return "Status de pedido foi mudado para 'Aceito'";
-
+    
+            await this.requestData.changeStatus(idPedido, newStatus);
+    
+            return `Status de pedido foi mudado para '${newStatus}'`;
+    
         } catch (err: any) {
             throw new CustomError(err.message, err.statusCode);
         }
     }
 
-    public rejectRequest = async (token: any, idPedido: any) => {
-        try {
-            const tokenData = TokenUtils.getTokenInformation(token);
-
-            if (tokenData.tipoUsuario.toLowerCase() !== "distribuidora") {
-                throw new CustomError("Somente distribuidoras podem rejeitar pedidos", 400);
-            }
-
-            const response = await this.requestData.checkRequest(idPedido);
-
-            if (response.length < 1) {
-                throw new CustomError("O pedido que você está tentando rejeitar não existe", 400);
-            }
-
-            if (response[0].statusPedido.toLowerCase() === "entregue") {
-                throw new CustomError("O pedido não pode ser rejeitado depois de entrega-lo", 400);
-            }
-
-            const response2 = await this.requestData.checkDistributorRequest(idPedido, tokenData.idUsuario);
-
-            if (response2.length < 1) {
-                throw new CustomError("O pedido não pertence a distribuidora", 400);
-            }
-
-            await this.requestData.changesStatusRejected(idPedido);
-
-            return "Status de pedido foi mudado para 'Rejeitado'";
-
-
-
-        } catch (err: any) {
-            throw new CustomError(err.message, err.statusCode);
-        }
-    }
-
-    public requestDelivered = async (token: any, idPedido: any) => {
-        try {
-            const tokenData = TokenUtils.getTokenInformation(token);
-
-            if (tokenData.tipoUsuario.toLowerCase() !== "distribuidora") {
-                throw new CustomError("Somente distribuidoras podem entregar pedidos", 400);
-            }
-
-            const response = await this.requestData.checkRequest(idPedido);
-
-            if (response.length < 1) {
-                throw new CustomError("O pedido que você está tentando mudar o status para entregue não existe", 400);
-            }
-
-            if (response[0].statusPedido.toLowerCase() === "entregue") {
-                throw new CustomError("O pedido que você está tentando mudar o status para entregue já possui esse status", 400);
-            }
-
-            const response2 = await this.requestData.checkDistributorRequest(idPedido, tokenData.idUsuario);
-
-            if (response2.length < 1) {
-                throw new CustomError("O pedido não pertence a distribuidora", 400);
-            }
-
-            await this.requestData.changesStatusDelivered(idPedido);
-
-            return "Status de pedido foi mudado para 'Entregue'";
-
-
-
-        } catch (err: any) {
-            throw new CustomError(err.message, err.statusCode);
-        }
-    }
-
-    public cancelRequest = async (token: any, idPedido: any) => {
+    public cancelServiceOrder = async (token: string, idPedido: string): Promise<string> => {
         try {
             const tokenData = TokenUtils.getTokenInformation(token);
 
@@ -202,7 +128,7 @@ export class RequestsBusiness {
                 throw new CustomError("O pedido não pertence ao cliente para ser cancelado", 400);
             }
 
-            await this.requestData.cancelRequest(idPedido);
+            await this.requestData.cancelServiceOrder(idPedido);
 
             return "O pedido foi cancelado";
 

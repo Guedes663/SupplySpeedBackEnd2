@@ -32,7 +32,7 @@ export class UserController {
     public searchInformation = async (req: Request, res: Response) => {
         try {
             const numPage = req.params.numPage;
-            const token = req.headers.authorization;
+            const token = req.headers.authorization  as string;
             const users = await this.userBusiness.searchInformation(numPage, token);
 
 
@@ -46,7 +46,7 @@ export class UserController {
     public getProfileInformation = async (req: Request, res: Response) => {
         try {
             const idProfile = req.params.idProfile;
-            const token = req.headers.authorization;
+            const token = req.headers.authorization  as string;
             const response = await this.userBusiness.getProfileInformation(token, idProfile);
 
 

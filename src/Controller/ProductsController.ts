@@ -7,10 +7,10 @@ export class ProductsController {
 
     public addProduct = async (req: Request, res: Response) => {
         try {
-            const token = req.headers.authorization;
+            const token  = req.headers.authorization as string;
             const productData = req.body;
             
-            await this.productBusiness.addProduct(token, productData);
+            await this.productBusiness.addProduct(token ,productData);
             
             res.status(200).send("Produto cadastrado!");
         } catch(err: any) {
@@ -20,7 +20,7 @@ export class ProductsController {
 
     public editProduct = async (req: Request, res: Response) => {
         try {
-            const token = req.headers.authorization;
+            const token = req.headers.authorization  as string;
             const idProduct = req.params.idProduto;
             const productData = req.body;
 
@@ -35,7 +35,7 @@ export class ProductsController {
 
     public deleteProduct = async (req: Request, res: Response) => {
         try {
-            const token = req.headers.authorization;
+            const token = req.headers.authorization  as string;
             const idProduct =req.params.idProduto;
             
             await this.productBusiness.deleteProduct(token, idProduct);

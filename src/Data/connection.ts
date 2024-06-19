@@ -17,6 +17,10 @@ const connection = knex({
             ca: fs.readFileSync(path.resolve(__dirname, "../../", process.env.DB_CA_PATH)),
         },
     },
+    pool: { 
+        min: 0,   
+        max: 10, 
+    }     
 });
 
 export default connection;

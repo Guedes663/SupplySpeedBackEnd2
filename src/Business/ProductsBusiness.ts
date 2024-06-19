@@ -1,5 +1,6 @@
 import { productsData } from "../Data/ProductsData";
 import { TokenData } from "../models/Token";
+import { ProductData } from "../models/productModel";
 import { CustomError } from "../utils/CustomError";
 import { TokenUtils } from "../utils/TokenUtils";
 import { uuidv7 as v7 } from '@kripod/uuidv7';
@@ -8,7 +9,7 @@ export class ProductBusiness {
 
     constructor(private productData: productsData) {}
 
-    public addProduct = async (token: any, productData: any) => {
+    public addProduct = async (token: string, productData: ProductData) => {
         try {
             const { descricao, valorUnidade, nomeComercial, nomeTecnico, peso, material, dimensoes, fabricante } = productData;
 
@@ -30,7 +31,7 @@ export class ProductBusiness {
         }
     }
 
-    public editProduct = async (token: any, idProduct: any, productData: any) => {
+    public editProduct = async (token: string, idProduct: string, productData: ProductData) => {
         try {
             const { descricao, valorUnidade, nomeComercial, nomeTecnico, peso, material, dimensoes, fabricante, statusProduto } = productData;
 
@@ -65,7 +66,7 @@ export class ProductBusiness {
         }
     }
 
-    public deleteProduct = async (token: any, idProduct: any) => {
+    public deleteProduct = async (token: string, idProduct: string) => {
         try {
             const tokenData: TokenData = TokenUtils.getTokenInformation(token);
 
