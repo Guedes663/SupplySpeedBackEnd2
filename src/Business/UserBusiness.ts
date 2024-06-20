@@ -4,6 +4,7 @@ import { TokenUtils } from "../utils/TokenUtils";
 import { uuidv7 as v7} from '@kripod/uuidv7';
 import { HashManager } from "../utils/HashManager";
 import { UsuarioModelo } from "../models/UserModel";
+import { LoginData } from "../types/LoginData";
 
 
 
@@ -61,7 +62,7 @@ export class UserBusiness {
     }
     
 
-    public login = async (loginData: any) => {
+    public login = async (loginData: LoginData) => {
         try {
             const { email, senha } = loginData;
 

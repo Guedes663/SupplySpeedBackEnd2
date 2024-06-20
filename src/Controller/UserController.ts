@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { UserBusiness } from '../Business/UserBusiness';
 import { UsuarioModelo } from '../models/UserModel';
+import { LoginData } from '../types/LoginData';
 
 export class UserController {
 
@@ -20,7 +21,7 @@ export class UserController {
 
     public login = async (req: Request, res: Response) => {
         try {
-            const loginData = req.body;
+            const loginData: LoginData = req.body;
             const token = await this.userBusiness.login(loginData);
 
             res.status(200).send(token);

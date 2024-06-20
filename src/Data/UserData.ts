@@ -11,7 +11,8 @@ export class UserData {
                 .where({
                     cnpj_cpf: usuarioModelo.cnpj_cpf,
                     email: usuarioModelo.email,
-                    nome: usuarioModelo.nome
+                    nome: usuarioModelo.nome,
+                    telefoneCelular: usuarioModelo.telefoneCelular
                 })
                 .select('*');
     

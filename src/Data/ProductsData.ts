@@ -6,7 +6,8 @@ export class productsData {
         try {
              
             await connection("produto").insert({
-                productData
+                productData,
+                idProduto
             });
 
             await connection("usuario_produto").insert({
