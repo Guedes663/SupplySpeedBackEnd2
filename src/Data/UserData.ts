@@ -1,53 +1,58 @@
-import { UsuarioModelo } from "../models/UserModel";
-import { UsuarioProduto } from "../models/UserProduct";
 import connection from "./connection";
-
 
 export class UserData {
 
-    public checkInfoExist = async (usuarioModelo: UsuarioModelo) => {
+    public checkInfoExist = async (data: any) => {
         try {
             const queryData = await connection('usuario')
-                .where({
-                    cnpj_cpf: usuarioModelo.cnpj_cpf,
-                    email: usuarioModelo.email,
-                    nome: usuarioModelo.nome,
-                    telefoneCelular: usuarioModelo.telefoneCelular
-                })
-                .select('*');
-    
-            return queryData.length > 0; 
-    
-        } catch (err: any) {
-            throw new Error(err.message);
-        }
-    }
-    
-    
+                .select("nome", "email", "cnpj_cpf", "telefoneCelular")
+                .whereRaw(
+                    "LOWER(nome) LIKE LOWER(?) OR LOWER(email) LIKE LOWER(?) OR cnpj_cpf LIKE ? OR telefoneCelular LIKE ?",
+                    [data.nome, data.email, data.cnpj_cpf, data.telefoneCelular]
+                );
 
-    public registerUser = async (usuarioModelo: UsuarioModelo) => {
-        try {
-            await connection("usuario").insert({
-                nome: usuarioModelo.nome,
-                email: usuarioModelo.email,
-                senha: usuarioModelo.senha,
-                tipoUsuario: usuarioModelo.tipoUsuario,
-                cnpj_cpf: usuarioModelo.cnpj_cpf,
-                descricao: usuarioModelo.descricao,
-                telefoneCelular: usuarioModelo.telefoneCelular,
-                estado: usuarioModelo.estado,
-                cidade: usuarioModelo.cidade,
-                bairro: usuarioModelo.bairro,
-                rua: usuarioModelo.rua,
-                numero: usuarioModelo.numero,
-                cep: usuarioModelo.cep,
-                idUsuario: usuarioModelo.idUsuario
-            });
+            return queryData;
+
         } catch (err: any) {
             throw new Error(err.message);
         }
     }
-    
+
+    public registerUser = async (data: any, idUsuario: string) => {
+        try {
+            const { nome, email, senha, tipoUsuario, cnpj_cpf, descricao, telefoneCelular, estado, cidade, bairro, rua, numero, cep } = data;
+
+            await connection("usuario").insert({
+                idUsuario,
+                nome,
+                email,
+                senha,
+                tipoUsuario,
+                cnpj_cpf,
+                descricao,
+                telefoneCelular,
+                estado,
+                cidade,
+                bairro,
+                rua,
+                numero,
+                cep
+            });
+
+            /*await connection("endereco").insert({
+                estado,
+                cidade,
+                bairro,
+                rua,
+                numero,
+                cep,
+                idUsuario
+            }); */
+
+        } catch (err: any) {
+            throw new Error(err.message);
+        }
+    }
 
     public authenticateUser = async (email: string) => {
         try {
@@ -62,13 +67,28 @@ export class UserData {
         }
     }
 
-    public searchInformation = async (numPage: any, token: any) => {
+    public searchInformation = async (numPage: any, userData: any) => {
         try {
-            if (token.tipoUsuario.toLowerCase() == "cliente") {
+            if (userData.tipoUsuario.toLowerCase() == "cliente") {
                 const distributors = await connection("usuario").select(
-                    token
+                    "usuario.idUsuario",
+                    "usuario.nome",
+                    "usuario.descricao",
+                    "usuario.estado",
+                    "usuario.cidade",
+                    "usuario.bairro",
+                    "usuario.rua",
+                    "usuario.numero",
+                    "usuario.cep"
+                    //"endereco.*",
+                    //"produto.*",
+                    //"produto.descricao as produto_descricao"
                 )
-                    .where(token.tipoUsuario, 'like', '%distribuidora%')
+                    //.from("usuario")
+                    //.innerJoin("endereco", "usuario.idUsuario", "endereco.idUsuario")
+                    //.innerJoin("usuario_produto", "usuario.idUsuario", "usuario_produto.idUsuario")
+                    //.innerJoin("produto", "usuario_produto.idProduto", "produto.idProduto")
+                    .where("usuario.tipoUsuario", "LIKE", "distribuidora")
                     .limit(10)
                     .offset((parseInt(numPage) - 1) * 10);
 
@@ -76,8 +96,18 @@ export class UserData {
             }
             else {
                 const customers = await connection.select(
-                    "usuario"
+                    "usuario.nome",
+                    "usuario.descricao",
+                    "usuario.estado",
+                    "usuario.cidade",
+                    "usuario.bairro",
+                    "usuario.rua",
+                    "usuario.numero",
+                    "usuario.cep"
+                    //"endereco.*"
                 )
+                    //.from("usuario")
+                    //.innerJoin("endereco", "usuario.idUsuario", "endereco.idUsuario")
                     .where("usuario.tipoUsuario", "LIKE", "cliente")
                     .limit(10)
                     .offset((parseInt(numPage) - 1) * 10);
@@ -89,7 +119,7 @@ export class UserData {
         }
     }
 
-    public checkIdPerfil = async (idUsuario: string) => {
+    public checkIdPerfil = async (idUsuario: any) => {
         try {
             const profileType = await connection.select("*").from("usuario").where({ idUsuario });
 
@@ -100,26 +130,47 @@ export class UserData {
         }
     }
 
-    public getProfileInformation = async (idUsuario: string) => {
+    public getProfileInformation = async (idUsuario: any) => {
         try {
-            let usuarioModelo: UsuarioModelo;
-            let UsuarioProduto: UsuarioProduto ;
             let infoUser = await connection("usuario")
                 .select(
-                    usuarioModelo
+                    "usuario.telefoneCelular",
+                    "usuario.nome",
+                    "produto.*",
+                    //"usuario.imagemDoUsuario",
+                    "usuario.descricao",
+                    "usuario.estado",
+                    "usuario.cidade",
+                    "usuario.bairro",
+                    "usuario.rua",
+                    "usuario.numero",
+                    "usuario.cep"
                 )
-                .innerJoin("usuario_produto", usuarioModelo.idUsuario, UsuarioProduto.idUsuario)
-                .innerJoin("produto", UsuarioProduto.idProduto, "produto.idProduto")
-                .where(usuarioModelo.idUsuario, idUsuario);
+                .innerJoin("usuario_produto", "usuario.idUsuario", "usuario_produto.idUsuario")
+                .innerJoin("produto", "usuario_produto.idProduto", "produto.idProduto")
+                .where("usuario.idUsuario", idUsuario);
 
             if (infoUser.length === 0) {
                 infoUser = await connection("usuario")
                     .select(
-                        usuarioModelo
+                        "usuario.telefoneCelular",
+                        "usuario.nome",
+                        //"produto.*",
+                        //"usuario.imagemDoUsuario",
+                        "usuario.descricao",
+                        "usuario.estado",
+                        "usuario.cidade",
+                        "usuario.bairro",
+                        "usuario.rua",
+                        "usuario.numero",
+                        "usuario.cep"
                     )
-                    .where(usuarioModelo.idUsuario, idUsuario);
+                    .where("usuario.idUsuario", idUsuario);
             }
-           
+            /*const addressUser = await connection("endereco")
+                .select("*")
+                .where("endereco.idUsuario", idUsuario);
+            */
 
             return infoUser;
 
@@ -128,5 +179,3 @@ export class UserData {
         }
     }
 }
-
-

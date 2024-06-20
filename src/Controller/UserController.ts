@@ -1,7 +1,5 @@
 import { Request, Response } from 'express';
 import { UserBusiness } from '../Business/UserBusiness';
-import { UsuarioModelo } from '../models/UserModel';
-import { LoginData } from '../types/LoginData';
 
 export class UserController {
 
@@ -9,7 +7,7 @@ export class UserController {
 
     public registerUser = async (req: Request, res: Response) => {
         try {
-            const registrationData: UsuarioModelo = req.body;
+            const registrationData = req.body;
             const token = await this.userBusiness.registerUser(registrationData);
 
             res.status(201).send(token);
@@ -21,7 +19,7 @@ export class UserController {
 
     public login = async (req: Request, res: Response) => {
         try {
-            const loginData: LoginData = req.body;
+            const loginData = req.body;
             const token = await this.userBusiness.login(loginData);
 
             res.status(200).send(token);
@@ -34,7 +32,7 @@ export class UserController {
     public searchInformation = async (req: Request, res: Response) => {
         try {
             const numPage = req.params.numPage;
-            const token = req.headers.authorization  as string;
+            const token = req.headers.authorization;
             const users = await this.userBusiness.searchInformation(numPage, token);
 
 
@@ -47,8 +45,8 @@ export class UserController {
 
     public getProfileInformation = async (req: Request, res: Response) => {
         try {
-            const idProfile = req.params.idProfile as string;
-            const token = req.headers.authorization  as string;
+            const idProfile = req.params.idProfile;
+            const token = req.headers.authorization;
             const response = await this.userBusiness.getProfileInformation(token, idProfile);
 
 

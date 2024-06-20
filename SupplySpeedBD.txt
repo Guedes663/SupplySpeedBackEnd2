@@ -1,0 +1,100 @@
+DROP DATABASE supplyspeedbd;
+CREATE DATABASE supplyspeedbd;
+USE SupplySpeedBD;
+
+CREATE TABLE usuario (
+	idUsuario VARCHAR(255) NOT NULL UNIQUE PRIMARY KEY,
+    nome VARCHAR(50) NOT NULL UNIQUE, 
+    email VARCHAR(50) NOT NULL UNIQUE,
+    senha VARCHAR(50) NOT NULL UNIQUE,
+    tipoUsuario TEXT NOT NULL,
+    CNPJ_CPF VARCHAR(18) NOT NULL UNIQUE,
+    descricao TEXT NOT NULL,
+    telefoneCelular INT NOT NULL UNIQUE,
+    imagemDoUsuario TEXT
+);
+
+CREATE TABLE endereco (
+	idEndereco INT NOT NULL AUTO_INCREMENT UNIQUE PRIMARY KEY,
+	estado VARCHAR(2) NOT NULL,
+    cidade TEXT NOT NULL,
+    bairro TEXT NOT NULL,
+    rua TEXT NOT NULL,
+    numero INT NOT NULL,
+    cep INT NOT NULL,
+    idUsuario VARCHAR(255) NOT NULL,
+    FOREIGN KEY (idUsuario) REFERENCES usuario(idUsuario)
+);
+
+CREATE TABLE pedido (
+	idPedido VARCHAR(255) NOT NULL PRIMARY KEY,
+    statusPedido TEXT NOT NULL,
+    dataEntrega DATE NOT NULL,
+    idEndereco INT NOT NULL,
+    FOREIGN KEY (idEndereco) REFERENCES endereco(idEndereco)
+);
+
+CREATE TABLE usuario_pedido (
+	idUsuarioRemetente VARCHAR(255) NOT NULL,
+    idUsuarioDestinatario VARCHAR(255) NOT NULL,
+    idPedido VARCHAR(255) NOT NULL,
+    PRIMARY KEY (idUsuarioRemetente, idUsuarioDestinatario, idPedido),
+    FOREIGN KEY ( idUsuarioRemetente ) REFERENCES usuario(idUsuario),
+    FOREIGN KEY ( idUsuarioDestinatario ) REFERENCES usuario(idUsuario),
+    FOREIGN KEY (idPedido) REFERENCES pedido(idPedido)
+);
+
+CREATE TABLE produto (
+	idProduto VARCHAR(255) NOT NULL UNIQUE PRIMARY KEY,
+    descricao TEXT NOT NULL,
+    valorUnidade FLOAT NOT NULL,
+    nomeComercial TEXT NOT NULL,
+    nomeTecnico TEXT NOT NULL,
+    peso FLOAT NOT NULL,
+    material TEXT NOT NULL,
+    dimensoes VARCHAR(50) NOT NULL,
+    fabricante TEXT NOT NULL,
+    statusProduto BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE pedido_produto (
+	idPedido VARCHAR(255) NOT NULL,
+    idProduto VARCHAR(255) NOT NULL,
+    quantidade INT NOT NULL,
+    PRIMARY KEY (idPedido, idProduto),
+    FOREIGN KEY (idPedido) REFERENCES pedido(idPedido),
+    FOREIGN KEY (idProduto) REFERENCES produto(idProduto)
+);
+
+CREATE TABLE usuario_produto (
+	idUsuario VARCHAR(255) NOT NULL,
+    idProduto VARCHAR(255) NOT NULL,
+    PRIMARY KEY (idUsuario, idProduto),
+    FOREIGN KEY (idUsuario) REFERENCES usuario(idUsuario),
+    FOREIGN KEY (idProduto) REFERENCES produto(idProduto)
+);
+
+INSERT INTO usuario (idUsuario, nome, email, senha, tipoUsuario, CNPJ_CPF, descricao, telefoneCelular) 
+VALUES ('1', 'Guedes', 'gabrielguedes7@gmail.com', '123456', 'Cliente', '161.859.076-66', 'Sou uma loja de eletrônicos', 91006568 );
+
+INSERT INTO usuario (idUsuario, nome, email, senha, tipoUsuario, CNPJ_CPF, descricao, telefoneCelular) 
+VALUES ('2', 'Juju', 'jujugameplay@gmail.com', 'juju69', 'cliente', '162.853.078-66', 'Sou uma loja de brinquedos sexuais', 88281205 );
+
+INSERT INTO usuario (idUsuario, nome, email, senha, tipoUsuario, CNPJ_CPF, descricao, telefoneCelular) 
+VALUES ('3', 'Jorge', 'jorgematadordeporco@gmail.com', 'jorge6969', 'distribuidora', '182.843.069-66', 'Sou uma distribuidora de produtos eletrônicos', 91057990 );
+
+
+INSERT INTO produto ( idProduto, descricao, valorUnidade, nomeComercial, nomeTecnico, peso, material, dimensoes, fabricante)
+VALUES ( '1', 'É uma placa de vídeo GTX 1060 6GB nova de fabrica', 900, 'placa de video', 'GTX 1060', 900, 'Ferro', '30cmx20cmx10cm', 'NVIDIA' );
+
+INSERT INTO usuario_produto(idUsuario, idProduto) VALUES ('3', 1);
+
+INSERT INTO endereco( estado, cidade, bairro, rua, numero, cep, idUsuario) VALUES( 'MG', 'Juiz de Fora', 'Centro', 'Rua Abidabidu', 170, 56944023, '2');
+INSERT INTO endereco( estado, cidade, bairro, rua, numero, cep, idUsuario) VALUES( 'MG', 'Belo Horizonte', 'Centro', 'Rua Masqueico', 160, 86794032, '1');
+INSERT INTO endereco( estado, cidade, bairro, rua, numero, cep, idUsuario) VALUES( 'MG', 'Muriaé', 'Centro', 'Rua Juju', 180, 61527345, '3');
+
+INSERT INTO pedido( idPedido, statusPedido, dataEntrega, idEndereco ) VALUES( '1', 'Em Andamento', '2024-06-06', 2);
+
+INSERT INTO usuario_pedido(idUsuarioRemetente, idUsuarioDestinatario, idPedido) VALUES( '1', '3', 1 );
+
+INSERT INTO pedido_produto(idPedido, idProduto, quantidade) VALUES ( 1, 1, 1 );

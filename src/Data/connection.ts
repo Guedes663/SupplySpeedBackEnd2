@@ -13,14 +13,10 @@ const connection = knex({
         user: process.env.DB_USER,
         password: process.env.DB_PASSWORD,
         database: process.env.DB_NAME,
-         ssl: {
-             ca: fs.readFileSync(path.resolve(__dirname, "../../", process.env.DB_CA_PATH)),
+        ssl: {
+            ca: fs.readFileSync(path.resolve(__dirname, "../../", process.env.DB_CA_PATH)),
         },
     },
-    pool: { 
-        min: 0,   
-        max: 10, 
-    }     
 });
 
 export default connection;

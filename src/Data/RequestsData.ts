@@ -1,46 +1,78 @@
 import connection from "./connection";
-import { UsuarioModelo } from '../models/UserModel';
-import { PedidoModel } from "../models/OrderModel";
-import { ProductModel } from "../models/productModel";
 
 export class RequestsData {
 
     public searchOrders = async (userData: any) => {
         try {
-            let UsuarioModelo: UsuarioModelo
-            let pedidoModel: PedidoModel
-            let productModel: ProductModel
-            let query = connection("usuario_pedido")
-                .select(
-                    UsuarioModelo,
-                    pedidoModel,
-                    productModel   
-                )
-                .innerJoin("usuario", function() {
-                    if (userData.tipoUsuario.toLowerCase() === "cliente") {
-                        this.on("usuario_pedido.idUsuarioDestinatario", "=", "usuario.idUsuario");
-                    } else {
-                        this.on("usuario_pedido.idUsuarioRemetente", "=", "usuario.idUsuario");
-                    }
-                })
-                .innerJoin("pedido", "usuario_pedido.idPedido", "=", "pedido.idPedido")
-                .innerJoin("pedido_produto", "pedido.idPedido", "=", "pedido_produto.idPedido")
-                .innerJoin("produto", "pedido_produto.idProduto", "=", "produto.idProduto");
-    
             if (userData.tipoUsuario.toLowerCase() === "cliente") {
-                query.where("usuario_pedido.idUsuarioRemetente", userData.idUsuario);
-            } else {
-                query.where("usuario_pedido.idUsuarioDestinatario", userData.idUsuario);
+                const ordersShipped = await connection("usuario_pedido").select(
+                    "usuario.nome",
+                    "pedido.idPedido",
+                    "pedido.dataHora",
+                    "pedido.statusPedido",
+                    "usuario.estado",
+                    "usuario.cidade",
+                    "usuario.bairro",
+                    "usuario.rua",
+                    "usuario.numero",
+                    "usuario.cep",
+                    "pedido_produto.quantidade",
+                    "produto.descricao",
+                    "produto.valorUnidade",
+                    "produto.nomeComercial",
+                    "produto.nomeTecnico",
+                    "produto.peso",
+                    "produto.material",
+                    "produto.dimensoes",
+                    "produto.fabricante"
+                )
+                    .from("usuario_pedido")
+                    .innerJoin("usuario", "usuario_pedido.idUsuarioDestinatario", "usuario.idUsuario")
+                    .innerJoin("pedido", "usuario_pedido.idPedido", "pedido.idPedido")
+                    //.innerJoin("endereco", "pedido.idEndereco", "endereco.idEndereco")
+                    .innerJoin("pedido_produto", "pedido.idPedido", "pedido_produto.idPedido")
+                    .innerJoin("produto", "pedido_produto.idProduto", "produto.idProduto")
+                    .where("usuario_pedido.idUsuarioRemetente", userData.idUsuario);
+
+                return ordersShipped;
             }
-    
-            const orders = await query;
-    
-            return orders;
+            else {
+                const ordersReceived = await connection("usuario_pedido").select(
+                    "usuario.nome",
+                    "pedido.dataHora",
+                    "pedido.statusPedido",
+                    "usuario.estado",
+                    "usuario.cidade",
+                    "usuario.bairro",
+                    "usuario.rua",
+                    "usuario.numero",
+                    "usuario.cep",
+                    "pedido_produto.quantidade",
+                    "produto.descricao",
+                    "produto.valorUnidade",
+                    "produto.nomeComercial",
+                    "produto.nomeTecnico",
+                    "produto.peso",
+                    "produto.material",
+                    "produto.dimensoes",
+                    "produto.fabricante"
+                )
+                    .from("usuario_pedido")
+                    .innerJoin("usuario", "usuario_pedido.idUsuarioRemetente", "usuario.idUsuario")
+                    .innerJoin("pedido", "usuario_pedido.idPedido", "pedido.idPedido")
+                    //.innerJoin("endereco", "pedido.idEndereco", "endereco.idEndereco")
+                    .innerJoin("pedido_produto", "pedido.idPedido", "pedido_produto.idPedido")
+                    .innerJoin("produto", "pedido_produto.idProduto", "produto.idProduto")
+                    .where("usuario_pedido.idUsuarioDestinatario", userData.idUsuario);
+
+                return ordersReceived;
+            }
         } catch (err: any) {
             throw new Error(err.message);
         }
     }
-    public distributorCheck = async (idUsuario: string) => {
+
+    public distributorCheck = async (idUsuario: any) => {
         try {
             const response = await connection("usuario")
                 .select("tipoUsuario")
@@ -53,7 +85,7 @@ export class RequestsData {
         }
     }
 
-    public checkProduct = async (idProduto: string) => {
+    public checkProduct = async (idProduto: any) => {
         try {
             const response = await connection("usuario_produto")
                 .select("idUsuario")
@@ -79,14 +111,14 @@ export class RequestsData {
         }
     }
 
-    public SendServiceOrder = async (idPedido: string, dataHora: Date,  idDistribuidora: string, idCliente: string, arrayProdutos: any) => {
+    public sendRequest = async (idPedido: any, dataHora: any, /*idEndereco: any,*/ idDistribuidora: any, idCliente: any, arrayProdutos: any) => {
         try {
             await connection("pedido")
                 .insert({
                     idPedido,
                     statusPedido: "Em análise",
                     dataHora
-               
+                    //idEndereco
                 });
 
             await connection("usuario_pedido")
@@ -110,10 +142,10 @@ export class RequestsData {
         }
     }
 
-    public checkRequest = async (idPedido: string) => {
+    public checkRequest = async (idPedido: any) => {
         try {
             const response = await connection("pedido")
-                .select("*")
+                .select("idPedido", "statusPedido")
                 .where({ idPedido });
 
             return response;
@@ -123,7 +155,7 @@ export class RequestsData {
         }
     }
 
-    public checkDistributorRequest = async (idPedido: string, idDistribuidora: string) => {
+    public checkDistributorRequest = async (idPedido: any, idDistribuidora: any) => {
         try {
             const response = await connection("usuario_pedido")
                 .select("*")
@@ -139,7 +171,7 @@ export class RequestsData {
         }
     }
 
-    public checkClientRequest = async (idPedido: string, idCliente: string) => {
+    public checkClientRequest = async (idPedido: any, idCliente: any) => {
         try {
             const response = await connection("usuario_pedido")
                 .select("*")
@@ -154,14 +186,44 @@ export class RequestsData {
             throw new Error(err.message);
         }
     }
-  
-    public async changeStatus(idPedido: string, newStatus: string): Promise<void> {
-        await connection("pedido")
-             .update({ statusPedido: newStatus })
-             .where({ idPedido });
+
+    public changesStatusAccepted = async (idPedido: any) => {
+        try {
+            await connection("pedido")
+                .update({ statusPedido: "Aceito" })
+                .where({ idPedido });
+
+
+        } catch (err: any) {
+            throw new Error(err.message);
+        }
     }
 
-    public cancelServiceOrder = async (idPedido: string) => {
+    public changesStatusRejected = async (idPedido: any) => {
+        try {
+            await connection("pedido")
+                .update({ statusPedido: "Rejeitado" })
+                .where({ idPedido });
+
+
+        } catch (err: any) {
+            throw new Error(err.message);
+        }
+    }
+
+    public changesStatusDelivered = async (idPedido: any) => {
+        try {
+            await connection("pedido")
+                .update({ statusPedido: "Entregue" })
+                .where({ idPedido });
+
+
+        } catch (err: any) {
+            throw new Error(err.message);
+        }
+    }
+
+    public cancelRequest = async (idPedido: any) => {
         try {
             await connection("usuario_pedido")
                 .where({ idPedido })

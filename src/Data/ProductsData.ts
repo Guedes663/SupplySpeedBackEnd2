@@ -1,13 +1,20 @@
-import { ProductModel } from "../models/productModel";
 import connection from "./connection";
 
 export class productsData {
-    public addProduct = async (productData: ProductModel , idUsuario: string, idProduto: string) => {
+    public addProduct = async (productData: any, idUsuario: any, idProduto: any) => {
         try {
-             
+            const { descricao, valorUnidade, nomeComercial, nomeTecnico, peso, material, dimensoes, fabricante } = productData;
+
             await connection("produto").insert({
-                productData,
-                idProduto
+                idProduto,
+                descricao,
+                valorUnidade,
+                nomeComercial,
+                nomeTecnico,
+                peso,
+                material,
+                dimensoes,
+                fabricante
             });
 
             await connection("usuario_produto").insert({
@@ -20,7 +27,7 @@ export class productsData {
         }
     }
 
-    public checkPermission = async (idUsuario: string, idProduto: string) => {
+    public checkPermission = async (idUsuario: any, idProduto: any) => {
         try {
             const queryResponse = await connection("usuario_produto")
                 .select("*")
@@ -32,7 +39,7 @@ export class productsData {
         }
     }
 
-    public productExists = async (idProduto: string) => {
+    public productExists = async (idProduto: any) => {
         try {
             const queryResponse = await connection("produto")
                 .select("statusProduto")
@@ -45,7 +52,7 @@ export class productsData {
         }
     }
 
-    public deleteProduct = async (idProduto: string) => {
+    public deleteProduct = async (idProduto: any) => {
         try {
             await connection("produto")
                 .where({ idProduto })
@@ -56,11 +63,13 @@ export class productsData {
             throw new Error(err.message);
         }
     }
-    public changeProduct = async (productData: any, idProduto: string) => {
+    public changeProduct = async (productData: any, idProduto: any) => {
         try {
+            const { descricao, valorUnidade, nomeComercial, nomeTecnico, peso, material, dimensoes, fabricante, statusProduto } = productData;
+
             await connection("produto")
                 .where({ idProduto })
-                .update({productData });
+                .update({ descricao, valorUnidade, nomeComercial, nomeTecnico, peso, material, dimensoes, fabricante, statusProduto });
 
         } catch (err: any) {
             throw new Error(err.message);
