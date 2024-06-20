@@ -3,8 +3,9 @@ import { CustomError } from "../utils/CustomError";
 import { TokenUtils } from "../utils/TokenUtils";
 import { uuidv7 as v7} from '@kripod/uuidv7';
 import { HashManager } from "../utils/HashManager";
-import { loginModel } from "../models/LoginModel";
-import { RegistrationData } from "../models/RegisterModel";
+import { UsuarioModelo } from "../models/UserModel";
+
+
 
 export class UserBusiness {
 
@@ -13,53 +14,54 @@ export class UserBusiness {
         private hashManager = new HashManager()
     ) { }
 
-    public registerUser = async (registrationData: RegistrationData) => {
+    public registerUser = async (registrationData: UsuarioModelo) => {
         try {
-            const { nome, email, senha, tipoUsuario, cnpj_cpf, descricao, telefoneCelular, estado, cidade, bairro, rua, numero, cep } = registrationData;
-
-            if (!nome || !email || !senha || !tipoUsuario || !cnpj_cpf || !descricao || !telefoneCelular || !estado || !cidade || !bairro || !rua || !numero || !cep) {
-                throw new CustomError("'nome', 'email', 'senha', 'tipoUsuario', 'cnpj_cpf', 'descricao', 'telefoneCelular', 'estado', 'cidade', 'bairro', 'rua', 'numero' e 'cep' são obrigatórios", 400);
+            const { nome, email, senha, tipoUsuario, cnpj_cpf, telefoneCelular } = registrationData;
+    
+            if (!registrationData) {
+                throw new CustomError("itens faltando no registro", 400);
             }
-
+    
             if (tipoUsuario.toLowerCase() !== "cliente" && tipoUsuario.toLowerCase() !== "distribuidora") {
                 throw new CustomError("O tipo de usuário só pode ser preenchida com 'cliente' ou 'distribuidora'", 400);
             }
+            const idUsuario = v7(); 
+            registrationData.idUsuario = idUsuario
+            console.log(registrationData)
 
-            const dataChecked = await this.userData.checkInfoExist({ nome, email, cnpj_cpf, telefoneCelular });
+            const dataChecked:any = await this.userData.checkInfoExist(registrationData);
             const SenhaForte = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=.*[^\w\d\s]).{8,}$/;
-
+    
             if (dataChecked.length > 0) {
                 if (dataChecked[0].nome === nome) {
                     throw new CustomError("nome de usuário já cadastrado", 409);
-                }
-                else if (dataChecked[0].email === email) {
+                } else if (dataChecked[0].email === email) {
                     throw new CustomError("Email já cadastrado", 409);
-                }
-                else if (dataChecked[0].cnpj_cpf === cnpj_cpf) {
+                } else if (dataChecked[0].cnpj_cpf === cnpj_cpf) {
                     throw new CustomError("cnpj_cpf já cadastrado", 409);
-                }
-                else if (dataChecked[0].telefoneCelular === telefoneCelular) {
+                } else if (dataChecked[0].telefoneCelular === telefoneCelular) {
                     throw new CustomError("telefone/celular já cadastrado", 409);
                 }
             }
+    
             if (!SenhaForte.test(senha)) {
                 throw new CustomError("A senha não atende aos critérios de segurança. Certifique-se de que ela contenha pelo menos 8 caracteres, incluindo letras maiúsculas, minúsculas, números e caracteres especiais.", 400);
             }
-
-            const idUsuario = v7();
+    
             registrationData.senha = await this.hashManager.hashPassword(senha);
-
-            await this.userData.registerUser(registrationData, idUsuario);
-
-            const token = TokenUtils.generateToken({ idUsuario, email, senha, tipoUsuario });
+    
+            await this.userData.registerUser(registrationData);
+    
+            const token = TokenUtils.generateToken({ idUsuario, email, tipoUsuario });
             return token;
-
+    
         } catch (err: any) {
             throw new CustomError(err.message, err.statusCode);
         }
     }
+    
 
-    public login = async (loginData: loginModel) => {
+    public login = async (loginData: any) => {
         try {
             const { email, senha } = loginData;
 
@@ -107,10 +109,12 @@ export class UserBusiness {
     public getProfileInformation = async (token: string, idProfile: string) => {
         try {
             TokenUtils.getTokenInformation(token);
-
+            if(!token){
+                throw new CustomError("O token que você passou não existe", 400);
+            }
             const profileType = await this.userData.checkIdPerfil(idProfile);
 
-            if (profileType.length < 1 /*|| profileType[0].tipoUsuario !== "distribuidora"*/) {
+            if (profileType.length < 1 ) {
                 throw new CustomError("O id do usuário que você passou não existe", 400);
             }
 

@@ -1,59 +1,61 @@
 import { productsData } from "../Data/ProductsData";
-import { TokenData } from "../models/Token";
-import { ProductData } from "../models/productModel";
+import { TokenData } from "../types/Token";
+import { ProductModel } from "../models/productModel";
 import { CustomError } from "../utils/CustomError";
 import { TokenUtils } from "../utils/TokenUtils";
 import { uuidv7 as v7 } from '@kripod/uuidv7';
 
 export class ProductBusiness {
 
-    constructor(private productData: productsData) {}
+    constructor(private productData: productsData) {
 
-    public addProduct = async (token: string, productData: ProductData) => {
+    }
+
+    public addProduct = async (token: string, productData: ProductModel) => {
         try {
             const { descricao, valorUnidade, nomeComercial, nomeTecnico, peso, material, dimensoes, fabricante } = productData;
 
-            if( !descricao || !valorUnidade || !nomeComercial || !nomeTecnico || !peso || !material || !dimensoes || !fabricante ) {
+            if (!descricao || !valorUnidade || !nomeComercial || !nomeTecnico || !peso || !material || !dimensoes || !fabricante) {
                 throw new CustomError("'descricao', 'valorUnidade', 'nomeComercial', 'nomeTecnico', 'peso', 'material', 'dimensoes' ou 'fabricante' está faltando", 400);
             }
 
             const tokenData: TokenData = TokenUtils.getTokenInformation(token);
 
-            if( tokenData.tipoUsuario.toLowerCase() !== "distribuidora") {
+            if (tokenData.tipoUsuario.toLowerCase() !== "distribuidora") {
                 throw new CustomError("Usuário não tem permissão para adicionar produto", 403);
             }
 
             const idProduct = v7();
             await this.productData.addProduct(productData, tokenData.idUsuario, idProduct);
 
-        } catch(err: any) {
+        } catch (err: any) {
             throw new CustomError(err.message, err.statusCode);
         }
     }
 
-    public editProduct = async (token: string, idProduct: string, productData: ProductData) => {
+    public editProduct = async (token: string, idProduct: string, productData: ProductModel) => {
         try {
             const { descricao, valorUnidade, nomeComercial, nomeTecnico, peso, material, dimensoes, fabricante, statusProduto } = productData;
 
-            if( !descricao && !valorUnidade && !nomeComercial && !nomeTecnico && !peso && !material && !dimensoes && !fabricante && !statusProduto ) {
+            if (!descricao && !valorUnidade && !nomeComercial && !nomeTecnico && !peso && !material && !dimensoes && !fabricante && !statusProduto) {
                 throw new CustomError("Nehnum dado foi recebido para alterar o produto", 400);
             }
-        
+
             const tokenData: TokenData = TokenUtils.getTokenInformation(token);
 
-            if( tokenData.tipoUsuario.toLowerCase() !== "distribuidora" ) {
+            if (tokenData.tipoUsuario.toLowerCase() !== "distribuidora") {
                 throw new CustomError("Usuário não é distribuidora", 403);
             }
 
             const queryResponse = await this.productData.productExists(idProduct);
 
-            if( queryResponse.length < 1 ) {
+            if (queryResponse.length < 1) {
                 throw new CustomError("Produto não existe", 400);
             }
 
             const queryResponse2 = await this.productData.checkPermission(tokenData.idUsuario, idProduct);
 
-            if( queryResponse2.length < 1 ) {
+            if (queryResponse2.length < 1) {
                 throw new CustomError("Usuário não tem permissão para editar o produto", 400);
             }
 
@@ -61,7 +63,7 @@ export class ProductBusiness {
 
             return "Produto modificado com sucesso!";
 
-        } catch(err: any) {
+        } catch (err: any) {
             throw new CustomError(err.message, err.statusCode);
         }
     }
@@ -70,25 +72,25 @@ export class ProductBusiness {
         try {
             const tokenData: TokenData = TokenUtils.getTokenInformation(token);
 
-            if( tokenData.tipoUsuario.toLowerCase() !== "distribuidora" ) {
+            if (tokenData.tipoUsuario.toLowerCase() !== "distribuidora") {
                 throw new CustomError("Usuário não é distribuidora", 403);
             }
 
             const queryResponse = await this.productData.productExists(idProduct);
 
-            if( queryResponse.length < 1 ) {
+            if (queryResponse.length < 1) {
                 throw new CustomError("Produto não existe", 400);
             }
 
             const queryResponse2 = await this.productData.checkPermission(tokenData.idUsuario, idProduct);
 
-            if( queryResponse2.length < 1 ) {
+            if (queryResponse2.length < 1) {
                 throw new CustomError("Usuário não tem permissão para excluir o produto", 400);
             }
 
             await this.productData.deleteProduct(idProduct);
-            
-        } catch(err: any) {
+
+        } catch (err: any) {
             throw new CustomError(err.message, err.statusCode);
         }
     }

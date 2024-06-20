@@ -1,30 +1,20 @@
 import connection from "./connection";
+import { UsuarioModelo } from '../models/UserModel';
+import { PedidoModel } from "../models/OrderModel";
+import { ProductModel } from "../models/productModel";
 
 export class RequestsData {
 
     public searchOrders = async (userData: any) => {
         try {
+            let UsuarioModelo: UsuarioModelo
+            let pedidoModel: PedidoModel
+            let productModel: ProductModel
             let query = connection("usuario_pedido")
                 .select(
-                    "usuario.nome",
-                    "pedido.idPedido",
-                    "pedido.dataHora",
-                    "pedido.statusPedido",
-                    "usuario.estado",
-                    "usuario.cidade",
-                    "usuario.bairro",
-                    "usuario.rua",
-                    "usuario.numero",
-                    "usuario.cep",
-                    "pedido_produto.quantidade",
-                    "produto.descricao",
-                    "produto.valorUnidade",
-                    "produto.nomeComercial",
-                    "produto.nomeTecnico",
-                    "produto.peso",
-                    "produto.material",
-                    "produto.dimensoes",
-                    "produto.fabricante"
+                    UsuarioModelo,
+                    pedidoModel,
+                    productModel   
                 )
                 .innerJoin("usuario", function() {
                     if (userData.tipoUsuario.toLowerCase() === "cliente") {
@@ -50,7 +40,7 @@ export class RequestsData {
             throw new Error(err.message);
         }
     }
-    public distributorCheck = async (idUsuario: any) => {
+    public distributorCheck = async (idUsuario: string) => {
         try {
             const response = await connection("usuario")
                 .select("tipoUsuario")
@@ -63,7 +53,7 @@ export class RequestsData {
         }
     }
 
-    public checkProduct = async (idProduto: any) => {
+    public checkProduct = async (idProduto: string) => {
         try {
             const response = await connection("usuario_produto")
                 .select("idUsuario")
@@ -89,7 +79,7 @@ export class RequestsData {
         }
     }
 
-    public SendServiceOrder = async (idPedido: any, dataHora: any,  idDistribuidora: any, idCliente: any, arrayProdutos: any) => {
+    public SendServiceOrder = async (idPedido: string, dataHora: Date,  idDistribuidora: string, idCliente: string, arrayProdutos: any) => {
         try {
             await connection("pedido")
                 .insert({
@@ -120,10 +110,10 @@ export class RequestsData {
         }
     }
 
-    public checkRequest = async (idPedido: any) => {
+    public checkRequest = async (idPedido: string) => {
         try {
             const response = await connection("pedido")
-                .select("idPedido", "statusPedido")
+                .select("*")
                 .where({ idPedido });
 
             return response;
@@ -133,7 +123,7 @@ export class RequestsData {
         }
     }
 
-    public checkDistributorRequest = async (idPedido: any, idDistribuidora: any) => {
+    public checkDistributorRequest = async (idPedido: string, idDistribuidora: string) => {
         try {
             const response = await connection("usuario_pedido")
                 .select("*")
@@ -149,7 +139,7 @@ export class RequestsData {
         }
     }
 
-    public checkClientRequest = async (idPedido: any, idCliente: any) => {
+    public checkClientRequest = async (idPedido: string, idCliente: string) => {
         try {
             const response = await connection("usuario_pedido")
                 .select("*")
@@ -165,13 +155,13 @@ export class RequestsData {
         }
     }
   
-    public async changeStatus(idPedido: any, newStatus: string): Promise<void> {
+    public async changeStatus(idPedido: string, newStatus: string): Promise<void> {
         await connection("pedido")
              .update({ statusPedido: newStatus })
              .where({ idPedido });
     }
 
-    public cancelServiceOrder = async (idPedido: any) => {
+    public cancelServiceOrder = async (idPedido: string) => {
         try {
             await connection("usuario_pedido")
                 .where({ idPedido })

@@ -1,50 +1,52 @@
+import { UsuarioModelo } from "../models/UserModel";
+import { UsuarioProduto } from "../models/UserProduct";
 import connection from "./connection";
 
+
 export class UserData {
-    
-    public checkInfoExist = async (data: any) => {
+
+    public checkInfoExist = async (usuarioModelo: UsuarioModelo) => {
         try {
             const queryData = await connection('usuario')
-                .select("nome", "email", "cnpj_cpf", "telefoneCelular")
-                .where(function() {
-                    this.where("nome", "ilike", `%${data.nome}%`)
-                        .orWhere("email", "ilike", `%${data.email}%`)
-                        .orWhere("cnpj_cpf", "LIKE", `%${data.cnpj_cpf}%`)
-                        .orWhere("telefoneCelular", "LIKE", `%${data.telefoneCelular}%`);
-                });
+                .where({
+                    cnpj_cpf: usuarioModelo.cnpj_cpf,
+                    email: usuarioModelo.email,
+                    nome: usuarioModelo.nome
+                })
+                .select('*');
     
-            return queryData;
+            return queryData.length > 0; 
     
         } catch (err: any) {
             throw new Error(err.message);
         }
     }
+    
+    
 
-    public registerUser = async (data: any, idUsuario: string) => {
+    public registerUser = async (usuarioModelo: UsuarioModelo) => {
         try {
-            const { nome, email, senha, tipoUsuario, cnpj_cpf, descricao, telefoneCelular, estado, cidade, bairro, rua, numero, cep } = data;
-
             await connection("usuario").insert({
-                idUsuario,
-                nome,
-                email,
-                senha,
-                tipoUsuario,
-                cnpj_cpf,
-                descricao,
-                telefoneCelular,
-                estado,
-                cidade,
-                bairro,
-                rua,
-                numero,
-                cep
+                nome: usuarioModelo.nome,
+                email: usuarioModelo.email,
+                senha: usuarioModelo.senha,
+                tipoUsuario: usuarioModelo.tipoUsuario,
+                cnpj_cpf: usuarioModelo.cnpj_cpf,
+                descricao: usuarioModelo.descricao,
+                telefoneCelular: usuarioModelo.telefoneCelular,
+                estado: usuarioModelo.estado,
+                cidade: usuarioModelo.cidade,
+                bairro: usuarioModelo.bairro,
+                rua: usuarioModelo.rua,
+                numero: usuarioModelo.numero,
+                cep: usuarioModelo.cep,
+                idUsuario: usuarioModelo.idUsuario
             });
-
         } catch (err: any) {
             throw new Error(err.message);
         }
     }
+    
 
     public authenticateUser = async (email: string) => {
         try {
@@ -59,21 +61,13 @@ export class UserData {
         }
     }
 
-    public searchInformation = async (numPage: any, userData: any) => {
+    public searchInformation = async (numPage: any, token: any) => {
         try {
-            if (userData.tipoUsuario.toLowerCase() == "cliente") {
+            if (token.tipoUsuario.toLowerCase() == "cliente") {
                 const distributors = await connection("usuario").select(
-                    "usuario.idUsuario",
-                    "usuario.nome",
-                    "usuario.descricao",
-                    "usuario.estado",
-                    "usuario.cidade",
-                    "usuario.bairro",
-                    "usuario.rua",
-                    "usuario.numero",
-                    "usuario.cep"
+                    token
                 )
-                    .where("usuario.tipoUsuario", "LIKE", "distribuidora")
+                    .where(token.tipoUsuario, 'like', '%distribuidora%')
                     .limit(10)
                     .offset((parseInt(numPage) - 1) * 10);
 
@@ -81,14 +75,7 @@ export class UserData {
             }
             else {
                 const customers = await connection.select(
-                    "usuario.nome",
-                    "usuario.descricao",
-                    "usuario.estado",
-                    "usuario.cidade",
-                    "usuario.bairro",
-                    "usuario.rua",
-                    "usuario.numero",
-                    "usuario.cep"
+                    "usuario"
                 )
                     .where("usuario.tipoUsuario", "LIKE", "cliente")
                     .limit(10)
@@ -101,7 +88,7 @@ export class UserData {
         }
     }
 
-    public checkIdPerfil = async (idUsuario: any) => {
+    public checkIdPerfil = async (idUsuario: string) => {
         try {
             const profileType = await connection.select("*").from("usuario").where({ idUsuario });
 
@@ -112,39 +99,24 @@ export class UserData {
         }
     }
 
-    public getProfileInformation = async (idUsuario: any) => {
+    public getProfileInformation = async (idUsuario: string) => {
         try {
+            let usuarioModelo: UsuarioModelo;
+            let UsuarioProduto: UsuarioProduto ;
             let infoUser = await connection("usuario")
                 .select(
-                    "usuario.telefoneCelular",
-                    "usuario.nome",
-                    "produto.*",
-                    "usuario.descricao",
-                    "usuario.estado",
-                    "usuario.cidade",
-                    "usuario.bairro",
-                    "usuario.rua",
-                    "usuario.numero",
-                    "usuario.cep"
+                    usuarioModelo
                 )
-                .innerJoin("usuario_produto", "usuario.idUsuario", "usuario_produto.idUsuario")
-                .innerJoin("produto", "usuario_produto.idProduto", "produto.idProduto")
-                .where("usuario.idUsuario", idUsuario);
+                .innerJoin("usuario_produto", usuarioModelo.idUsuario, UsuarioProduto.idUsuario)
+                .innerJoin("produto", UsuarioProduto.idProduto, "produto.idProduto")
+                .where(usuarioModelo.idUsuario, idUsuario);
 
             if (infoUser.length === 0) {
                 infoUser = await connection("usuario")
                     .select(
-                        "usuario.telefoneCelular",
-                        "usuario.nome",
-                        "usuario.descricao",
-                        "usuario.estado",
-                        "usuario.cidade",
-                        "usuario.bairro",
-                        "usuario.rua",
-                        "usuario.numero",
-                        "usuario.cep"
+                        usuarioModelo
                     )
-                    .where("usuario.idUsuario", idUsuario);
+                    .where(usuarioModelo.idUsuario, idUsuario);
             }
            
 
@@ -155,3 +127,5 @@ export class UserData {
         }
     }
 }
+
+

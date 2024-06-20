@@ -1,6 +1,6 @@
 import * as jwt from "jsonwebtoken";
 import { CustomError } from "./CustomError";
-import { TokenData } from "../models/Token";
+import { TokenData } from "../types/Token";
 
 export class TokenUtils {
 

@@ -1,20 +1,12 @@
+import { ProductModel } from "../models/productModel";
 import connection from "./connection";
 
 export class productsData {
-    public addProduct = async (productData: any, idUsuario: any, idProduto: any) => {
+    public addProduct = async (productData: ProductModel , idUsuario: string, idProduto: string) => {
         try {
-            const { descricao, valorUnidade, nomeComercial, nomeTecnico, peso, material, dimensoes, fabricante } = productData;
-
+             
             await connection("produto").insert({
-                idProduto,
-                descricao,
-                valorUnidade,
-                nomeComercial,
-                nomeTecnico,
-                peso,
-                material,
-                dimensoes,
-                fabricante
+                productData
             });
 
             await connection("usuario_produto").insert({
@@ -27,7 +19,7 @@ export class productsData {
         }
     }
 
-    public checkPermission = async (idUsuario: any, idProduto: any) => {
+    public checkPermission = async (idUsuario: string, idProduto: string) => {
         try {
             const queryResponse = await connection("usuario_produto")
                 .select("*")
@@ -39,7 +31,7 @@ export class productsData {
         }
     }
 
-    public productExists = async (idProduto: any) => {
+    public productExists = async (idProduto: string) => {
         try {
             const queryResponse = await connection("produto")
                 .select("statusProduto")
@@ -52,7 +44,7 @@ export class productsData {
         }
     }
 
-    public deleteProduct = async (idProduto: any) => {
+    public deleteProduct = async (idProduto: string) => {
         try {
             await connection("produto")
                 .where({ idProduto })
@@ -63,13 +55,11 @@ export class productsData {
             throw new Error(err.message);
         }
     }
-    public changeProduct = async (productData: any, idProduto: any) => {
+    public changeProduct = async (productData: any, idProduto: string) => {
         try {
-            const { descricao, valorUnidade, nomeComercial, nomeTecnico, peso, material, dimensoes, fabricante, statusProduto } = productData;
-
             await connection("produto")
                 .where({ idProduto })
-                .update({ descricao, valorUnidade, nomeComercial, nomeTecnico, peso, material, dimensoes, fabricante, statusProduto });
+                .update({productData });
 
         } catch (err: any) {
             throw new Error(err.message);

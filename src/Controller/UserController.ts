@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { UserBusiness } from '../Business/UserBusiness';
+import { UsuarioModelo } from '../models/UserModel';
 
 export class UserController {
 
@@ -7,7 +8,7 @@ export class UserController {
 
     public registerUser = async (req: Request, res: Response) => {
         try {
-            const registrationData = req.body;
+            const registrationData: UsuarioModelo = req.body;
             const token = await this.userBusiness.registerUser(registrationData);
 
             res.status(201).send(token);
@@ -45,7 +46,7 @@ export class UserController {
 
     public getProfileInformation = async (req: Request, res: Response) => {
         try {
-            const idProfile = req.params.idProfile;
+            const idProfile = req.params.idProfile as string;
             const token = req.headers.authorization  as string;
             const response = await this.userBusiness.getProfileInformation(token, idProfile);
 

@@ -1,6 +1,6 @@
 import { PedidoStatus } from "../types/statusType";
 
-export interface ProductData {
+export interface ProductModel {
     descricao: string;
     valorUnidade: number;
     nomeComercial: string;

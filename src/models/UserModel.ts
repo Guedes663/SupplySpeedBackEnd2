@@ -1,4 +1,5 @@
-export interface RegistrationData {
+export interface UsuarioModelo {
+    idUsuario: string;
     nome: string;
     email: string;
     senha: string;

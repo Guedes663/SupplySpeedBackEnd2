@@ -9,9 +9,9 @@ const requestsData = new RequestsData();
 const requestsBusiness = new RequestsBusiness(requestsData);
 const requestsController = new RequestsController(requestsBusiness);
 
-requestsRoutes.get("/search", requestsController.searchOrders);
-requestsRoutes.post("/send", requestsController.SendServiceOrder);
-requestsRoutes.put("/accept", requestsController.changeStatus);
-requestsRoutes.delete("/cancel/:idPedido", requestsController.cancelServiceOrder);
+requestsRoutes.get("/search", requestsController.searchOrders.bind(requestsController));
+requestsRoutes.post("/send", requestsController.sendServiceOrder.bind(requestsController));
+requestsRoutes.put("/accept", requestsController.changeStatus.bind(requestsController));
+requestsRoutes.delete("/cancel/:idPedido", requestsController.cancelServiceOrder.bind(requestsController));;
 
 export { requestsRoutes };
