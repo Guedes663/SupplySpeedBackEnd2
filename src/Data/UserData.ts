@@ -1,14 +1,14 @@
 import connection from "./connection";
 
 export class UserData {
-
+    
     public checkInfoExist = async (data: any) => {
         try {
             const queryData = await connection('usuario')
                 .select("nome", "email", "cnpj_cpf", "telefoneCelular")
                 .where(function() {
-                    this.whereRaw("LOWER(nome) LIKE LOWER(?)", [`%${data.nome}%`])
-                        .orWhereRaw("LOWER(email) LIKE LOWER(?)", [`%${data.email}%`])
+                    this.where("nome", "ilike", `%${data.nome}%`)
+                        .orWhere("email", "ilike", `%${data.email}%`)
                         .orWhere("cnpj_cpf", "LIKE", `%${data.cnpj_cpf}%`)
                         .orWhere("telefoneCelular", "LIKE", `%${data.telefoneCelular}%`);
                 });
@@ -19,7 +19,6 @@ export class UserData {
             throw new Error(err.message);
         }
     }
-    
 
     public registerUser = async (data: any, idUsuario: string) => {
         try {

@@ -7,7 +7,7 @@ export class RequestsController {
 
     public searchOrders = async (req: Request, res: Response): Promise<void> => {
         try {
-            const token = req.headers.authorization  as string;
+            const token = req.headers.authorization as string;
             const response = await this.requestBusiness.searchOrders(token);
 
             res.status(200).send(response);

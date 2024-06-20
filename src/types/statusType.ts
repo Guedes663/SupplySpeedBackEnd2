@@ -1,5 +1,7 @@
 export enum PedidoStatus {
     Aceito = "Aceito",
     Rejeitado = "Rejeitado",
-    Entregue = "Entregue"
+    Entregue = "Entregue",
+    EmAnalise = "Em Analise",
+    Cancelado = "Cancelado"
 }
